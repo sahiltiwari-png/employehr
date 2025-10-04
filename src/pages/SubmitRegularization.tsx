@@ -35,7 +35,8 @@ const SubmitRegularization = () => {
   const [formData, setFormData] = useState<CreateRegularizationRequest>({
     date: "",
     field: "clockIn",
-    requestedTime: "",
+    // Default to 09:00 to ensure a valid initial state
+    requestedTime: "09:00",
     reason: "",
   });
 
@@ -104,10 +105,12 @@ const SubmitRegularization = () => {
   };
 
   const handleFormSearchFocus = () => {
+    if (navState?.employeeId) return;
     setShowFormEmployeeDropdown(true);
   };
 
   const handleFormSearchClick = () => {
+    if (navState?.employeeId) return;
     setShowFormEmployeeDropdown(true);
   };
 
@@ -129,10 +132,10 @@ const SubmitRegularization = () => {
   const handleFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!formSelectedEmployee || !formData.date || !formData.requestedTime || !formData.reason.trim()) {
+    if (!formSelectedEmployee || !formData.date || !formData.reason.trim()) {
       toast({
         title: "Error",
-        description: "Please fill in all required fields including employee selection",
+        description: "Please fill in all required fields including employee selection and reason",
         variant: "destructive",
       });
       return;
@@ -149,6 +152,7 @@ const SubmitRegularization = () => {
         field: formData.field,
         requestedTime: requestedDateTime,
         reason: formData.reason,
+        employeeId: formSelectedEmployee?._id,
       };
 
       await createRegularizationRequest(requestPayload);

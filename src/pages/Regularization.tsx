@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
+import { useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import {
   Select,
@@ -62,10 +63,27 @@ const Regularization = () => {
   const [formSelectedEmployee, setFormSelectedEmployee] = useState<EmployeeType | null>(null);
   const [showFormEmployeeDropdown, setShowFormEmployeeDropdown] = useState(false);
   const [loadingFormEmployees, setLoadingFormEmployees] = useState(false);
+  // URL query params
+  const location = useLocation();
+  const [queryEmployeeId, setQueryEmployeeId] = useState<string | null>(null);
+  const [queryStatus, setQueryStatus] = useState<string | null>(null);
+
+  // Read URL query on mount
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const empId = params.get('employeeId');
+    const stat = params.get('status');
+    if (empId) setQueryEmployeeId(empId);
+    if (stat && (stat === 'pending' || stat === 'approved' || stat === 'rejected')) {
+      setStatus(stat);
+      setQueryStatus(stat);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     fetchRegularizationRequests();
-  }, [selectedEmployee, status, currentPage]);
+  }, [selectedEmployee, status, currentPage, user]);
 
   // Search employees when user types or when dropdown is opened
   useEffect(() => {
@@ -90,8 +108,10 @@ const Regularization = () => {
         limit: itemsPerPage
       };
 
-      if (selectedEmployee) {
-        filters.employeeId = selectedEmployee._id;
+      // Prefer selected employee; otherwise query param; otherwise logged-in user's id
+      const fallbackEmployeeId = selectedEmployee?._id || queryEmployeeId || (user?._id || (user as any)?.id);
+      if (fallbackEmployeeId) {
+        filters.employeeId = fallbackEmployeeId;
       }
 
       if (status !== "all") {
