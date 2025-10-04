@@ -1,28 +1,20 @@
-import { useEffect, useState, useContext, useRef } from "react";
-import { getOrganizations } from "@/api/organizations";
+import { useEffect, useState, useRef } from "react";
 import { getDashboardStats } from "@/api/dashboard";
 import { getHolidayCalendar, saveHolidayCalendar } from "@/api/holidayCalendar";
 import { uploadFile } from "@/api/uploadFile";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { OrgSearchContext } from "@/components/layout/MainLayout";
-import { Plus, Building, Users, X, LogIn, LogOut, ClipboardList, Calculator, FileText } from "lucide-react";
+import { Users, X, LogIn, LogOut, ClipboardList, Calculator, FileText } from "lucide-react";
 import { getEmployeeById } from "@/api/employees";
 import { getAttendance, clockInEmployee, clockOutEmployee } from "@/api/attendance";
 import { format } from "date-fns";
-import { Link, useNavigate, useLocation } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from '@/contexts/AuthContext';
-import EmployeeList from "@/components/employees/EmployeeList";
 import { toast } from "@/hooks/use-toast";
 const Dashboard = () => {
-  const [organizations, setOrganizations] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
   // Dashboard stats state for companyAdmin
   const [dashboardStats, setDashboardStats] = useState<any>(null);
   const [dashboardLoading, setDashboardLoading] = useState(false);
   const [dashboardError, setDashboardError] = useState("");
-  const { search } = useContext(OrgSearchContext);
   const { user } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
@@ -46,74 +38,55 @@ const Dashboard = () => {
     }
   }, [location.state]);
 
-  useEffect(() => {
-    if (user?.role === 'superAdmin') {
-      const fetchOrganizations = async () => {
-        try {
-          setLoading(true);
-          const data = await getOrganizations();
-          setOrganizations(Array.isArray(data) ? data : (Array.isArray(data?.organizations) ? data.organizations : []));
-        } catch (err) {
-          setError("Failed to load organizations");
-        } finally {
-          setLoading(false);
-        }
-      };
-      fetchOrganizations();
-    }
-  }, [user?.role]);
+  // Removed SuperAdmin organizations fetch; dashboard always renders the companyAdmin UI now.
 
-  // Company Admin & HR Dashboard UI (matches provided image)
+  // Dashboard data and holiday calendar for any authenticated user with organizationId
   useEffect(() => {
-    if (user?.role === 'companyAdmin' || user?.role === 'hr') {
-      setDashboardLoading(true);
-      setDashboardError("");
-      getDashboardStats()
-        .then((data) => setDashboardStats(data))
-        .catch(() => setDashboardError("Failed to load dashboard stats"))
-        .finally(() => setDashboardLoading(false));
-      // Fetch holiday calendar with organizationId
-      setCalendarLoading(true);
-      if (user?.organizationId) {
-        getHolidayCalendar(user.organizationId)
-          .then((response) => {
-            if (response?.data) {
-              setCalendarData(response.data);
-            } else {
-              setCalendarData(null);
-            }
-          })
-          .catch((error) => {
-            console.error("Error fetching holiday calendar:", error);
+    setDashboardLoading(true);
+    setDashboardError("");
+    getDashboardStats()
+      .then((data) => setDashboardStats(data))
+      .catch(() => setDashboardError("Failed to load dashboard stats"))
+      .finally(() => setDashboardLoading(false));
+    // Fetch holiday calendar with organizationId (if available)
+    setCalendarLoading(true);
+    if (user?.organizationId) {
+      getHolidayCalendar(user.organizationId)
+        .then((response) => {
+          if (response?.data) {
+            setCalendarData(response.data);
+          } else {
             setCalendarData(null);
-          })
-          .finally(() => setCalendarLoading(false));
-      } else {
-        console.error("Missing organizationId for holiday calendar");
-        setCalendarLoading(false);
-      }
-    }
-  }, [user?.role, user?.organizationId]);
-
-  // Fetch employee profile and today's attendance for banner
-  useEffect(() => {
-    if (user?.role === 'companyAdmin' || user?.role === 'hr') {
-      const id = user?._id || user?.id;
-      if (!id) return;
-      // Employee details
-      getEmployeeById(id)
-        .then((data) => setEmployee(data))
-        .catch(() => setEmployee(null));
-      // Today's attendance
-      const today = format(new Date(), 'yyyy-MM-dd');
-      getAttendance({ page: 1, limit: 1, startDate: today, endDate: today, employeeId: id })
-        .then((res: any) => {
-          const item = Array.isArray(res?.items) ? res.items[0] : null;
-          setAttendanceToday(item);
+          }
         })
-        .catch(() => setAttendanceToday(null));
+        .catch((error) => {
+          console.error("Error fetching holiday calendar:", error);
+          setCalendarData(null);
+        })
+        .finally(() => setCalendarLoading(false));
+    } else {
+      console.error("Missing organizationId for holiday calendar");
+      setCalendarLoading(false);
     }
-  }, [user?.role, user?._id, user?.id]);
+  }, [user?.organizationId]);
+
+  // Fetch employee profile and today's attendance for banner (any role)
+  useEffect(() => {
+    const id = user?._id || user?.id;
+    if (!id) return;
+    // Employee details
+    getEmployeeById(id)
+      .then((data) => setEmployee(data))
+      .catch(() => setEmployee(null));
+    // Today's attendance
+    const today = format(new Date(), 'yyyy-MM-dd');
+    getAttendance({ page: 1, limit: 1, startDate: today, endDate: today, employeeId: id })
+      .then((res: any) => {
+        const item = Array.isArray(res?.items) ? res.items[0] : null;
+        setAttendanceToday(item);
+      })
+      .catch(() => setAttendanceToday(null));
+  }, [user?._id, user?.id]);
 
   const getGeolocation = (): Promise<{lat:number; lng:number}> => {
     return new Promise((resolve) => {
@@ -180,7 +153,8 @@ const Dashboard = () => {
       // Send the full image URL as calendarFileName
       const saveRes = await saveHolidayCalendar(user.organizationId, url);
       console.log('saveHolidayCalendar response:', saveRes);
-      setCalendarUrl(url);
+      // Update local calendar preview state
+      setCalendarData((prev) => ({ ...(prev || {}), calendarFile: url, calendarFileName: url }));
     } catch (err) {
       console.error('Calendar upload error:', err);
       alert('Upload failed: ' + (err?.message || err));
@@ -188,9 +162,8 @@ const Dashboard = () => {
       setCalendarLoading(false);
     }
   };
-
-  if (user?.role === 'companyAdmin' || user?.role === 'hr') {
-    return (
+  // Company Admin style Dashboard UI (shown to all roles)
+  return (
       <div className="min-h-screen bg-gradient-to-br from-green-200 to-green-50 py-6 px-2 md:px-8">
         {/* Image Modal */}
         {showImageModal && calendarData?.calendarFile && (
@@ -443,60 +416,6 @@ const Dashboard = () => {
         </div>
       </div>
     );
-  }
-  // Super Admin Dashboard UI (default)
-  return (
-    <div className="p-6">
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-3xl font-bold text-black">Create and Manage all organizations in one place</h1>
-      </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {/* Create Organization Card - always first */}
-        <Card
-          className="hover:shadow-lg transition-shadow flex flex-col items-center p-0 border-2 border-dashed border-green-600 bg-green-50 cursor-pointer group min-h-[220px]"
-          onClick={() => window.location.href = '/create-organization'}
-        >
-          <div className="flex-1 w-full flex flex-col items-center justify-center p-8">
-            <Plus className="h-10 w-10 text-green-600 mb-2 group-hover:scale-110 transition-transform" />
-            <h3 className="font-bold text-lg text-green-700 text-center mb-2">Create Organization</h3>
-            <p className="text-green-800 text-center text-sm">Start a new organization</p>
-          </div>
-        </Card>
-        {/* Organization Cards */}
-        {loading ? (
-          <div className="col-span-full flex justify-center items-center h-40">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600"></div>
-          </div>
-        ) : error ? (
-          <div className="col-span-full text-center text-destructive p-4">{error}</div>
-        ) : organizations.length === 0 ? (
-          <div className="col-span-full flex flex-col items-center justify-center h-40 text-center">
-            <Building className="h-16 w-16 text-muted-foreground mb-4" />
-            <h3 className="text-lg font-medium">No Organizations Found</h3>
-            <p className="text-muted-foreground mt-1">Create your first organization to get started</p>
-          </div>
-        ) : (
-          organizations
-            .filter(org => org.name?.toLowerCase().includes(search.toLowerCase()))
-            .map((org, index) => (
-              <Card key={org._id || index} className="hover:shadow-md transition-shadow flex flex-col items-center p-0">
-                {org.logoUrl && (
-                  <img src={org.logoUrl} alt={org.name} className="w-full h-32 object-cover rounded-t" />
-                )}
-                <div className="flex-1 w-full flex flex-col items-center p-4">
-                  <h3 className="font-bold text-xl text-center mb-4 w-full">{org.name}</h3>
-                  <Button className="w-full mt-auto bg-green-600 hover:bg-green-700 text-white" asChild>
-                    <Link to={`/organizations/${org._id}`}>
-                      View Details
-                    </Link>
-                  </Button>
-                </div>
-              </Card>
-            ))
-        )}
-      </div>
-    </div>
-  );
 };
 
 export default Dashboard;

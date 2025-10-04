@@ -6,7 +6,6 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { AuthProvider } from "./contexts/AuthContext";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
-import RoleRoute from "./components/auth/RoleRoute";
 
 // Pages
 import Login from "./pages/Login";
@@ -58,172 +57,32 @@ const App = () => (
                     <Routes>
                       <Route path="/" element={<Navigate to="/dashboard" replace />} />
                       <Route path="/dashboard" element={<Dashboard />} />
-                      <Route
-                        path="/employees"
-                        element={
-                          <RoleRoute allowedRoles={["companyAdmin","hr"]} redirectTo="/dashboard">
-                            <Employees />
-                          </RoleRoute>
-                        }
-                      />
+                      <Route path="/employees" element={<Employees />} />
                       <Route path="/add-employee" element={<AddEmployeeStepper />} />
-                      {/* SuperAdmin-only routes */}
-                      <Route
-                        path="/hr"
-                        element={
-                          <RoleRoute allowedRoles={["superAdmin"]} redirectTo="/dashboard">
-                            <HR />
-                          </RoleRoute>
-                        }
-                      />
-                      <Route
-                        path="/hr/:id"
-                        element={
-                          <RoleRoute allowedRoles={["superAdmin"]} redirectTo="/dashboard">
-                            <HR />
-                          </RoleRoute>
-                        }
-                      />
-                      <Route
-                        path="/admin"
-                        element={
-                          <RoleRoute allowedRoles={["superAdmin"]} redirectTo="/dashboard">
-                            <AdminPanel />
-                          </RoleRoute>
-                        }
-                      />
-                      <Route
-                        path="/regularization"
-                        element={
-                          <RoleRoute allowedRoles={["companyAdmin","hr"]} redirectTo="/dashboard">
-                            <Regularization />
-                          </RoleRoute>
-                        }
-                      />
-                      <Route
-                        path="/regularization/submit"
-                        element={
-                          <RoleRoute allowedRoles={["companyAdmin","hr"]} redirectTo="/dashboard">
-                            <SubmitRegularization />
-                          </RoleRoute>
-                        }
-                      />
+                      {/* Previously SuperAdmin-only routes; now accessible to all authenticated users */}
+                      <Route path="/hr" element={<HR />} />
+                      <Route path="/hr/:id" element={<HR />} />
+                      <Route path="/admin" element={<AdminPanel />} />
+                      <Route path="/regularization" element={<Regularization />} />
+                      <Route path="/regularization/submit" element={<SubmitRegularization />} />
                       <Route path="/organizations/:id" element={<OrganizationDetails />} />
-                      {/* CompanyAdmin-only routes */}
-                      <Route
-                        path="/payroll"
-                        element={
-                          <RoleRoute allowedRoles={["companyAdmin","hr"]} redirectTo="/dashboard">
-                            <Payroll />
-                          </RoleRoute>
-                        }
-                      />
-                      <Route
-                        path="/salary-slips"
-                        element={
-                          <RoleRoute allowedRoles={["companyAdmin","hr"]} redirectTo="/dashboard">
-                            <SalarySlips />
-                          </RoleRoute>
-                        }
-                      />
-                      <Route
-                        path="/attendance"
-                        element={
-                          <RoleRoute allowedRoles={["companyAdmin","hr"]} redirectTo="/dashboard">
-                            <Attendance />
-                          </RoleRoute>
-                        }
-                      />
-                      <Route
-                        path="/attendance/employee/:id"
-                        element={
-                          <RoleRoute allowedRoles={["companyAdmin","hr"]} redirectTo="/dashboard">
-                            <EmployeeAttendanceDetail />
-                          </RoleRoute>
-                        }
-                      />
-                      <Route
-                        path="/apply-leave"
-                        element={
-                          <RoleRoute allowedRoles={["companyAdmin"]} redirectTo="/dashboard">
-                            <ApplyLeave />
-                          </RoleRoute>
-                        }
-                      />
-                      <Route
-                        path="/leaves"
-                        element={
-                          <RoleRoute allowedRoles={["companyAdmin","hr"]} redirectTo="/dashboard">
-                            <Leaves />
-                          </RoleRoute>
-                        }
-                      />
-                      <Route
-                        path="/leaves/policy"
-                        element={
-                          <RoleRoute allowedRoles={["companyAdmin","hr"]} redirectTo="/dashboard">
-                            <LeavePolicy />
-                          </RoleRoute>
-                        }
-                      />
-                      <Route
-                        path="/leaves/requests"
-                        element={
-                          <RoleRoute allowedRoles={["companyAdmin","hr"]} redirectTo="/dashboard">
-                            <LeaveRequests />
-                          </RoleRoute>
-                        }
-                      />
-                      <Route
-                        path="/leaves/allotment"
-                        element={
-                          <RoleRoute allowedRoles={["companyAdmin","hr"]} redirectTo="/dashboard">
-                            <LeaveAllotment />
-                          </RoleRoute>
-                        }
-                      />
-                      <Route
-                        path="/leaves/allotment/history/:employeeId"
-                        element={
-                          <RoleRoute allowedRoles={["companyAdmin","hr"]} redirectTo="/dashboard">
-                            <LeaveAllotmentHistory />
-                          </RoleRoute>
-                        }
-                      />
-                      <Route
-                        path="/reports/employees"
-                        element={
-                          <RoleRoute allowedRoles={["companyAdmin","hr"]} redirectTo="/dashboard">
-                            <EmployeesReport />
-                          </RoleRoute>
-                        }
-                      />
-                      <Route
-                        path="/reports/leave-requests"
-                        element={
-                          <RoleRoute allowedRoles={["companyAdmin","hr"]} redirectTo="/dashboard">
-                            <LeaveRequestsReport />
-                          </RoleRoute>
-                        }
-                      />
-                      <Route
-                        path="/reports/payroll"
-                        element={
-                          <RoleRoute allowedRoles={["companyAdmin","hr"]} redirectTo="/dashboard">
-                            <PayrollReport />
-                          </RoleRoute>
-                        }
-                      />
+                      {/* Previously CompanyAdmin-only routes; now accessible to all authenticated users */}
+                      <Route path="/payroll" element={<Payroll />} />
+                      <Route path="/salary-slips" element={<SalarySlips />} />
+                      <Route path="/attendance" element={<Attendance />} />
+                      <Route path="/attendance/employee/:id" element={<EmployeeAttendanceDetail />} />
+                      <Route path="/apply-leave" element={<ApplyLeave />} />
+                      <Route path="/leaves" element={<Leaves />} />
+                      <Route path="/leaves/policy" element={<LeavePolicy />} />
+                      <Route path="/leaves/requests" element={<LeaveRequests />} />
+                      <Route path="/leaves/allotment" element={<LeaveAllotment />} />
+                      <Route path="/leaves/allotment/history/:employeeId" element={<LeaveAllotmentHistory />} />
+                      <Route path="/reports/employees" element={<EmployeesReport />} />
+                      <Route path="/reports/leave-requests" element={<LeaveRequestsReport />} />
+                      <Route path="/reports/payroll" element={<PayrollReport />} />
                       <Route path="/settings" element={<Settings />} />
                       <Route path="/profile" element={<Profile />} />
-                      <Route
-                        path="/create-organization"
-                        element={
-                          <RoleRoute allowedRoles={["superAdmin"]} redirectTo="/dashboard">
-                            <CreateOrganization />
-                          </RoleRoute>
-                        }
-                      />
+                      <Route path="/create-organization" element={<CreateOrganization />} />
                       <Route path="*" element={<NotFound />} />
                     </Routes>
                   </MainLayout>
