@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from "react";
-import { getDashboardStats } from "@/api/dashboard";
+import { getEmployeeDashboard } from "@/api/dashboard";
 import { getHolidayCalendar, saveHolidayCalendar } from "@/api/holidayCalendar";
 import { uploadFile } from "@/api/uploadFile";
 import { Button } from "@/components/ui/button";
@@ -11,8 +11,8 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from "@/hooks/use-toast";
 const Dashboard = () => {
-  // Dashboard stats state for companyAdmin
-  const [dashboardStats, setDashboardStats] = useState<any>(null);
+  // Employee-specific dashboard data state
+  const [employeeDashboard, setEmployeeDashboard] = useState<any>(null);
   const [dashboardLoading, setDashboardLoading] = useState(false);
   const [dashboardError, setDashboardError] = useState("");
   const { user } = useAuth();
@@ -40,14 +40,19 @@ const Dashboard = () => {
 
   // Removed SuperAdmin organizations fetch; dashboard always renders the companyAdmin UI now.
 
-  // Dashboard data and holiday calendar for any authenticated user with organizationId
+  // Dashboard data (employee-specific) and holiday calendar for any authenticated user with organizationId
   useEffect(() => {
     setDashboardLoading(true);
     setDashboardError("");
-    getDashboardStats()
-      .then((data) => setDashboardStats(data))
-      .catch(() => setDashboardError("Failed to load dashboard stats"))
-      .finally(() => setDashboardLoading(false));
+    const id = user?._id || user?.id;
+    if (id) {
+      getEmployeeDashboard(id)
+        .then((data) => setEmployeeDashboard(data))
+        .catch(() => setDashboardError("Failed to load dashboard"))
+        .finally(() => setDashboardLoading(false));
+    } else {
+      setDashboardLoading(false);
+    }
     // Fetch holiday calendar with organizationId (if available)
     setCalendarLoading(true);
     if (user?.organizationId) {
@@ -68,7 +73,7 @@ const Dashboard = () => {
       console.error("Missing organizationId for holiday calendar");
       setCalendarLoading(false);
     }
-  }, [user?.organizationId]);
+  }, [user?.organizationId, user?._id, user?.id]);
 
   // Fetch employee profile and today's attendance for banner (any role)
   useEffect(() => {
@@ -289,7 +294,7 @@ const Dashboard = () => {
           </div>
           {/* Right: Cards */}  
           <div className="md:w-2/3 grid grid-cols-1 sm:grid-cols-2 gap-4 items-stretch">
-            {/* Total Employees (full width) */}
+            {/* Total Attendance (full width) */}
             <div className="bg-white rounded-2xl border-[1.5px] border-[#2C373B]/30 shadow-none p-3 sm:p-4 sm:col-span-2">
               <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
                 <div className="flex items-center gap-3">
@@ -297,25 +302,27 @@ const Dashboard = () => {
                     <Users className="h-5 w-5 text-green-600" />
                   </div>
                   <div>
-                    <div className="text-gray-700 text-base font-semibold flex items-center gap-2">
-                      <span>Total Employees</span>
-                      <span className="text-3xl font-bold leading-none text-[#4CDC9C]">{dashboardStats?.employees?.total ?? '-'}</span>
-                    </div>
-                    <div className="flex gap-4 text-xs mt-2">
-                      <span className="text-[#9E9E9E] font-medium">Active <span className="text-green-600 font-medium">{dashboardStats?.employees?.active ?? '-'}</span></span>
-                      <span className="text-[#9E9E9E] font-medium">Inactive <span className="text-red-500 font-medium">{dashboardStats?.employees?.inactive ?? '-'}</span></span>
-                    </div>
+                    <div className="text-gray-700 text-base font-semibold">Total Attendance</div>
+                    <div className="text-xs text-gray-400 -mt-1">this month</div>
                   </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-3xl font-bold leading-none text-[#4CDC9C]">{employeeDashboard?.attendance?.totalAttendance ?? '-'}</span>
+                  <span className="text-gray-700 text-lg font-semibold">/{employeeDashboard?.attendance?.totalDays ?? '-'}</span>
                 </div>
                 <button
                   className="w-full sm:w-auto bg-[#4CDC9C] text-[#2C373B] hover:bg-[#3fd190] rounded-lg px-4 py-2 font-semibold transition"
-                  onClick={() => navigate('/employees')}
+                  onClick={() => navigate('/attendance')}
                 >
-                  Manage Employees
+                  View Attendance
                 </button>
               </div>
+              <div className="flex gap-6 text-xs mt-2">
+                <span className="text-[#9E9E9E] font-medium">Present <span className="text-green-600 font-medium">{employeeDashboard?.attendance?.present ?? '-'}</span></span>
+                <span className="text-[#9E9E9E] font-medium">Absent <span className="text-red-500 font-medium">{employeeDashboard?.attendance?.absent ?? '-'}</span></span>
+              </div>
             </div>
-            {/* Total Leave Requests (full width) */}
+            {/* Leave Balance (full width) */}
             <div className="bg-white rounded-2xl border-[1.5px] border-[#2C373B]/30 shadow-none p-3 sm:p-4 sm:col-span-2">
               <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
                 <div className="flex items-center gap-3">
@@ -323,26 +330,34 @@ const Dashboard = () => {
                     <ClipboardList className="h-5 w-5 text-green-600" />
                   </div>
                   <div>
-                    <div className="text-gray-700 text-base font-semibold flex items-center gap-2">
-                      <span>Total Leave requests</span>
-                      <span className="text-3xl font-bold leading-none text-[#4CDC9C]">{dashboardStats?.leaves?.total ?? '-'}</span>
-                    </div>
-                    <div className="flex gap-4 text-xs mt-2">
-                      <span className="text-[#9E9E9E] font-medium">Approved <span className="text-green-600 font-medium">{dashboardStats?.leaves?.approved ?? '-'}</span></span>
-                      <span className="text-[#9E9E9E] font-medium">Declined <span className="text-red-500 font-medium">{dashboardStats?.leaves?.declined ?? '-'}</span></span>
-                      <span className="text-[#9E9E9E] font-medium">Pending <span className="text-yellow-500 font-medium">{dashboardStats?.leaves?.pending ?? '-'}</span></span>
-                    </div>
+                    <div className="text-gray-700 text-base font-semibold">Leave Balance</div>
                   </div>
                 </div>
-                <button
-                  className="w-full sm:w-auto bg-[#4CDC9C] text-[#2C373B] hover:bg-[#3fd190] rounded-lg px-4 py-2 font-semibold transition"
-                  onClick={() => navigate('/leaves/requests')}
-                >
-                  Manage leaves requests
-                </button>
+                <div className="flex items-center gap-2">
+                  <span className="text-3xl font-bold leading-none text-[#4CDC9C]">{employeeDashboard?.leaveBalance?.total ?? '-'}</span>
+                </div>
+                <div className="flex gap-2">
+                  <button
+                    className="bg-white border border-[#2C373B]/30 text-[#2C373B] rounded-lg px-3 py-2 font-semibold transition hover:bg-gray-50"
+                    onClick={() => navigate('/leaves/balance')}
+                  >
+                    View Balance
+                  </button>
+                  <button
+                    className="bg-[#4CDC9C] text-[#2C373B] hover:bg-[#3fd190] rounded-lg px-3 py-2 font-semibold transition"
+                    onClick={() => navigate('/apply-leave')}
+                  >
+                    Apply Leave
+                  </button>
+                </div>
+              </div>
+              <div className="flex gap-6 text-xs mt-2">
+                <span className="text-[#9E9E9E] font-medium">Casual <span className="text-green-600 font-medium">{employeeDashboard?.leaveBalance?.casual ?? '-'}</span></span>
+                <span className="text-[#9E9E9E] font-medium">Earned <span className="text-yellow-500 font-medium">{employeeDashboard?.leaveBalance?.earned ?? '-'}</span></span>
+                <span className="text-[#9E9E9E] font-medium">Medical <span className="text-red-500 font-medium">{employeeDashboard?.leaveBalance?.medical ?? '-'}</span></span>
               </div>
             </div>
-            {/* Leave Policy - Redesigned to match screenshot */}
+            {/* Leave Policy */}
             <div className="bg-white rounded-2xl border-[1.5px] border-[#2C373B]/30 shadow-none p-3 sm:p-4 flex flex-col justify-between">
               <div className="flex items-center gap-3 mb-2">
                 <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center">
@@ -351,18 +366,18 @@ const Dashboard = () => {
                 <span className="text-gray-700 font-semibold text-base">Leave Policy</span>
               </div>
               <div className="flex items-end gap-2 mb-1">
-                <span className="text-3xl font-bold leading-none text-[#4CDC9C]">{dashboardStats?.leavePolicies?.activePolicies ?? '-'}</span>
+                <span className="text-3xl font-bold leading-none text-[#4CDC9C]">{employeeDashboard?.leavePolicy?.activePolicyCount ?? '-'}</span>
                 <span className="text-base text-gray-700 font-medium mb-1">active policy</span>
               </div>
               <div className="flex gap-4 text-xs font-medium mb-3">
-                <span className="text-gray-400">Maternity <span className="text-green-500 font-bold">{dashboardStats?.leavePolicies?.leaveTypesSummary?.maternity?.intervalValue ?? '-'}</span></span>
-                <span className="text-gray-400">Earned <span className="text-yellow-500 font-bold">{dashboardStats?.leavePolicies?.leaveTypesSummary?.earned?.intervalValue ?? '-'}</span></span>
+                <span className="text-gray-400">Medical <span className="text-green-500 font-bold">{employeeDashboard?.leaveBalance?.medical ?? '-'}</span></span>
+                <span className="text-gray-400">Earned <span className="text-yellow-500 font-bold">{employeeDashboard?.leaveBalance?.earned ?? '-'}</span></span>
               </div>
               <button 
                 className="w-[85%] mx-auto bg-[#4CDC9C] text-[#2C373B] hover:bg-[#3fd190] rounded-lg py-2 font-semibold transition text-base shadow-none"
                 onClick={() => navigate('/leaves/policy')}
               >
-                Manage Leave Policy
+                View Leave Policy
               </button>
             </div>
             {/* Payroll Processed */}
@@ -377,21 +392,24 @@ const Dashboard = () => {
                     <div className="text-xs text-gray-400 -mt-1">this month</div>
                   </div>
                 </div>
-                <div>
-                  <span className="text-3xl sm:text-4xl font-bold leading-none text-[#4CDC9C]">
-                    {dashboardStats?.payroll?.processed ?? '-'}/{dashboardStats?.payroll?.totalEmployees ?? dashboardStats?.employees?.total ?? '-'}
-                  </span>
-                  <span className="text-sm text-gray-700 font-medium ml-2">employees</span>
+                <div className="text-sm text-gray-700">
+                  <div className="mb-1">Payment Date - {employeeDashboard?.payroll?.paymentDate ? format(new Date(employeeDashboard.payroll.paymentDate), 'dd/MM/yyyy') : '-'}</div>
+                  <div>Net Salary <span className="text-[#4CDC9C] font-semibold">₹{employeeDashboard?.payroll?.netSalary ?? 0}</span></div>
                 </div>
-                <div className="text-xs">
-                  <span className="text-[#9E9E9E] font-medium">Pending employees <span className="text-red-500 font-medium">{dashboardStats?.payroll?.pending ?? '-'}</span></span>
+                <div className="flex gap-2">
+                  <button
+                    className="bg-white border border-[#2C373B]/30 text-[#2C373B] rounded-lg px-3 py-2 font-semibold transition hover:bg-gray-50"
+                    onClick={() => navigate('/salary-slips')}
+                  >
+                    Salary Slip
+                  </button>
+                  <button 
+                    className="bg-[#4CDC9C] text-[#2C373B] hover:bg-[#3fd190] rounded-lg px-3 py-2 font-semibold transition"
+                    onClick={() => navigate('/payroll')}
+                  >
+                    View Payroll
+                  </button>
                 </div>
-                <button 
-                  className="w-[85%] mx-auto bg-[#4CDC9C] text-[#2C373B] hover:bg-[#3fd190] rounded-lg py-2 font-semibold transition"
-                  onClick={() => navigate('/payroll')}
-                >
-                  Manage Payroll
-                </button>
               </div>
             </div>
             {/* Reports */}
@@ -407,10 +425,9 @@ const Dashboard = () => {
                   className="w-full sm:w-auto bg-[#4CDC9C] text-[#2C373B] hover:bg-[#3fd190] rounded-lg px-4 py-2 font-semibold transition"
                   onClick={() => navigate('/reports/employees')}
                 >
-                  Manage Reports
+                  View Reports
                 </button>
               </div>
-              <div className="mt-3 text-3xl font-bold leading-none text-[#4CDC9C]">{dashboardStats?.reports?.total ?? '-'}</div>
             </div>
           </div>
         </div>
