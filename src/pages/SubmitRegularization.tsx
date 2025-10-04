@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Navigate, useNavigate } from "react-router-dom";
+import { Navigate, useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import {
   Select,
@@ -23,6 +23,8 @@ import { toast } from "@/components/ui/use-toast";
 
 const SubmitRegularization = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const navState = (location.state as { employeeId?: string; employeeName?: string; employeeCode?: string; date?: string } | null) || null;
   const storedRole = localStorage.getItem('role');
   if (storedRole === 'superAdmin') {
     return <Navigate to="/dashboard" replace />;
@@ -50,6 +52,32 @@ const SubmitRegularization = () => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [formEmployeeSearch, showFormEmployeeDropdown]);
+
+  // Prefill employee and date from Attendance navigation state
+  useEffect(() => {
+    if (navState?.employeeId) {
+      const fullName = navState.employeeName || "";
+      const [firstName, ...rest] = fullName.split(" ");
+      const lastName = rest.join(" ");
+      setFormSelectedEmployee({
+        _id: navState.employeeId,
+        firstName,
+        lastName,
+        employeeCode: navState.employeeCode || "",
+      } as EmployeeType);
+      setFormEmployeeSearch(
+        `${fullName}${navState.employeeCode ? ` (${navState.employeeCode})` : ""}`
+      );
+    }
+    if (navState?.date) {
+      const d = new Date(navState.date);
+      const yyyy = d.getFullYear();
+      const mm = String(d.getMonth() + 1).padStart(2, '0');
+      const dd = String(d.getDate()).padStart(2, '0');
+      setFormData(prev => ({ ...prev, date: `${yyyy}-${mm}-${dd}` }));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const searchFormEmployees = async () => {
     try {
@@ -116,13 +144,14 @@ const SubmitRegularization = () => {
       // Combine date and time into ISO string
       const requestedDateTime = new Date(`${formData.date}T${formData.requestedTime}`).toISOString();
 
-      const requestPayload = {
-        ...formData,
-        employeeId: formSelectedEmployee._id,
+      const requestPayload: CreateRegularizationRequest = {
+        date: formData.date,
+        field: formData.field,
         requestedTime: requestedDateTime,
+        reason: formData.reason,
       };
 
-      await createRegularizationRequest(requestPayload as any);
+      await createRegularizationRequest(requestPayload);
 
       toast({
         title: "Success",
@@ -190,18 +219,21 @@ const SubmitRegularization = () => {
                         {formSelectedEmployee.firstName} {formSelectedEmployee.lastName}
                       </span>
                       <span className="text-emerald-600 text-xs">({formSelectedEmployee.employeeCode})</span>
-                      <button type="button" onClick={clearFormEmployee} className="text-emerald-600 hover:text-emerald-800 ml-1">
-                        <X className="h-4 w-4" />
-                      </button>
+                      {!navState?.employeeId && (
+                        <button type="button" onClick={clearFormEmployee} className="text-emerald-600 hover:text-emerald-800 ml-1">
+                          <X className="h-4 w-4" />
+                        </button>
+                      )}
                     </div>
                   ) : (
                     <>
                       <Input
-                        placeholder="Click to select employee..."
+                        placeholder={navState?.employeeId ? "Employee is prefilled from Attendance" : "Click to select employee..."}
                         value={formEmployeeSearch}
                         onChange={(e) => setFormEmployeeSearch(e.target.value)}
                         onFocus={handleFormSearchFocus}
                         onClick={handleFormSearchClick}
+                        readOnly={!!navState?.employeeId}
                         className="border-0 p-0 focus-visible:ring-0 focus-visible:ring-offset-0 text-sm placeholder:text-[#2C373B] cursor-pointer flex-1 bg-[rgb(209,250,229)] text-[#2C373B]"
                       />
                       <ChevronDown className="h-4 w-4 text-gray-400 flex-shrink-0" />
@@ -210,7 +242,7 @@ const SubmitRegularization = () => {
                 </div>
 
                 {/* Employee Dropdown */}
-                {showFormEmployeeDropdown && (formEmployees.length > 0 || loadingFormEmployees) && (
+                {!navState?.employeeId && showFormEmployeeDropdown && (formEmployees.length > 0 || loadingFormEmployees) && (
                   <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-emerald-200 rounded-lg shadow-lg z-50 max-h-48 overflow-y-auto">
                     {loadingFormEmployees ? (
                       <div className="p-2 text-center text-gray-500 text-sm">Searching...</div>
@@ -273,6 +305,7 @@ const SubmitRegularization = () => {
                     type="date"
                     value={formData.date}
                     onChange={(e) => handleFormChange("date", e.target.value)}
+                    disabled={!!navState?.date}
                     className="pr-10 bg-[rgb(209,250,229)] text-[#2C373B]"
                     required
                   />

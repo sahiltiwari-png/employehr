@@ -316,7 +316,16 @@ const Attendance = () => {
                         size="sm"
                         className="px-3 py-1 rounded-md text-xs font-semibold"
                         style={{ backgroundColor: '#4582F5', color: '#ffffff' }}
-                        onClick={() => navigate('/regularization/submit')}
+                        onClick={() =>
+                          navigate('/regularization/submit', {
+                            state: {
+                              employeeId: record.employee?._id,
+                              employeeName: record.employee?.name,
+                              employeeCode: record.employee?.employeeCode,
+                              date: record.date,
+                            },
+                          })
+                        }
                       >
                         Regularize
                       </Button>
