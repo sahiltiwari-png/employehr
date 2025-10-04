@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { Badge } from "@/components/ui/badge";
-import { Calendar as CalendarIcon, ChevronLeft, ChevronRight, Eye, User } from "lucide-react";
+import { Calendar as CalendarIcon, ChevronLeft, ChevronRight, ChevronDown, User } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -15,7 +15,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
-import { getEmployeeAttendanceById } from "@/api/attendance";
+import { getAttendance } from "@/api/attendance";
 import { useAuth } from "@/contexts/AuthContext";
 
 interface Employee {
@@ -46,7 +46,12 @@ interface AttendanceResponse {
 
 const Attendance = () => {
   const { user } = useAuth();
-  const [date, setDate] = useState<Date>(new Date());
+  const [dateRange, setDateRange] = useState<{ startDate: Date | null; endDate: Date | null }>(() => {
+    const now = new Date();
+    const start = new Date(now.getFullYear(), now.getMonth(), 1);
+    const end = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+    return { startDate: start, endDate: end };
+  });
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
   const [statusFilter, setStatusFilter] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
@@ -62,7 +67,6 @@ const Attendance = () => {
     const fetchAttendanceData = async () => {
       setLoading(true);
       try {
-        const formattedDate = format(date, 'yyyy-MM-dd');
         const params: any = { page: currentPage, limit: 10 };
         
         // Add status filter if selected
@@ -71,9 +75,9 @@ const Attendance = () => {
           params.status = statusFilter;
         }
 
-        // Add date parameters for single date selection
-        params.startDate = formattedDate;
-        params.endDate = formattedDate;
+        // Add date parameters for range selection
+        if (dateRange.startDate) params.startDate = format(dateRange.startDate, 'yyyy-MM-dd');
+        if (dateRange.endDate) params.endDate = format(dateRange.endDate, 'yyyy-MM-dd');
 
         // Resolve employeeId from auth if not manually set
         const id = employeeId || (user?._id || (user as any)?.id);
@@ -84,8 +88,37 @@ const Attendance = () => {
           params.search = searchQuery.trim();
         }
 
-        const response = await getEmployeeAttendanceById(id, params);
-        if (response && response.attendance) {
+        const response = await getAttendance({ ...params, employeeId: id });
+        if (response && Array.isArray(response.items)) {
+          const normalizedItems = response.items.map((item: any) => ({
+            _id: item._id,
+            employee: item.employee ? item.employee : {
+              _id: item.employeeId || (user?._id || (user as any)?.id),
+              name:
+                (item.employee && item.employee.name) ||
+                user?.name || `${(user as any)?.firstName || ''} ${(user as any)?.lastName || ''}`.trim() || 'Employee',
+              employeeCode: (item.employee && item.employee.employeeCode) || (user as any)?.employeeCode || '',
+              designation: (item.employee && item.employee.designation) || (user as any)?.designation || '',
+              profilePhotoUrl: (item.employee && item.employee.profilePhotoUrl) || (user as any)?.profilePhotoUrl || (user as any)?.profileImage || undefined,
+            },
+            status: item.status,
+            clockIn: item.clockIn ?? null,
+            clockOut: item.clockOut ?? null,
+            totalWorkingHours: typeof item.totalWorkingHours === 'string' ? item.totalWorkingHours : (item.totalWorkingHours ?? null),
+            date: item.date,
+          }));
+
+          const normalized: AttendanceResponse = {
+            page: response.page || 1,
+            limit: response.limit || 10,
+            total: response.total || normalizedItems.length,
+            totalPages: response.totalPages || 1,
+            items: normalizedItems,
+          };
+          setAttendanceData(normalized);
+          setError(null);
+        } else if (response && response.attendance) {
+          // Fallback if API returns a single attendance object
           const rec = response.attendance;
           const normalized: AttendanceResponse = {
             page: 1,
@@ -125,7 +158,7 @@ const Attendance = () => {
     };
 
     fetchAttendanceData();
-  }, [currentPage, statusFilter, date, employeeId, searchQuery, user]);
+  }, [currentPage, statusFilter, dateRange, employeeId, searchQuery, user]);
 
   const getStatusBadgeClass = (status: string) => {
     switch (status.toLowerCase()) {
@@ -157,7 +190,10 @@ const Attendance = () => {
     setStatusFilter(null);
     setEmployeeId(null);
     setSearchQuery('');
-    setDate(new Date());
+    const now = new Date();
+    const start = new Date(now.getFullYear(), now.getMonth(), 1);
+    const end = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+    setDateRange({ startDate: start, endDate: end });
     setCurrentPage(1);
   };
 
@@ -177,25 +213,23 @@ const Attendance = () => {
               <PopoverTrigger asChild>
                 <Button
                   variant="outline"
-                  className="flex items-center gap-2 text-sm border-emerald-300 hover:bg-emerald-200 focus:border-emerald-400 focus:ring-0 h-8"
+                  className="flex items-center gap-2 text-sm border-emerald-300 bg-emerald-100 text-emerald-700 hover:bg-emerald-200 hover:text-emerald-800 focus:border-emerald-400 focus:ring-0 h-8"
                   style={{backgroundColor: 'rgb(209 250 229)', color: '#2C373B'}}
                 >
                   <CalendarIcon className="h-4 w-4 text-emerald-600" />
-                  <span>{format(date, "MMM d, yyyy")}</span>
+                  Calendar
+                  <ChevronDown className="h-4 w-4 text-emerald-600" />
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-auto p-0" align="start">
                 <Calendar
-                mode="single"
-                selected={date}
-                onSelect={(date) => {
-                  if (date) {
-                    setDate(date);
-                  }
-                }}
-                initialFocus
-                className="rounded-md border [&_.rdp-day_button:hover:not([disabled])]:bg-emerald-100 [&_.rdp-day_button:hover:not([disabled])]:text-emerald-700 [&_.rdp-day_button:focus:not([disabled])]:bg-emerald-100 [&_.rdp-day_button:focus:not([disabled])]:text-emerald-700 [&_.rdp-day_button.rdp-day_selected]:bg-emerald-600 [&_.rdp-day_button.rdp-day_selected]:text-white"
-              />
+                  mode="range"
+                  selected={{ from: dateRange.startDate || undefined, to: dateRange.endDate || undefined }}
+                  onSelect={(range) => {
+                    if (range?.from) setDateRange({ startDate: range.from, endDate: range.to || null });
+                  }}
+                  className="rounded-md border [&_.rdp-day_button:hover:not([disabled])]:bg-emerald-100 [&_.rdp-day_button:hover:not([disabled])]:text-emerald-700 [&_.rdp-day_button:focus:not([disabled])]:bg-emerald-100 [&_.rdp-day_button:focus:not([disabled])]:text-emerald-700 [&_.rdp-day_button.rdp-day_selected]:bg-emerald-600 [&_.rdp-day_button.rdp-day_selected]:text-white"
+                />
               </PopoverContent>
             </Popover>
 
@@ -270,19 +304,13 @@ const Attendance = () => {
                     </td>
                     <td className="px-4 py-2">
                       <Button
-                        variant="link"
-                        size="icon"
-                        className="h-8 w-8 p-0"
-                        style={{backgroundColor: '#4CDC9C', color: '#2C373B'}}
-                        onClick={() => navigate(`/attendance/employee/${record.employee._id}`, {
-                          state: {
-                            employeeName: record.employee.name,
-                            employeeDesignation: record.employee.designation,
-                            profilePhotoUrl: record.employee.profilePhotoUrl
-                          }
-                        })}
+                        variant="ghost"
+                        size="sm"
+                        className="px-3 py-1 rounded-md text-xs font-semibold"
+                        style={{ backgroundColor: '#4582F5', color: '#ffffff' }}
+                        onClick={() => navigate('/regularization/submit')}
                       >
-                        <Eye className="w-5 h-5" />
+                        Regularize
                       </Button>
                     </td>
                   </tr>
