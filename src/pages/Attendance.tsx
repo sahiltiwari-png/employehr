@@ -229,6 +229,14 @@ const Attendance = () => {
                     if (range?.from) setDateRange({ startDate: range.from, endDate: range.to || null });
                   }}
                   className="rounded-md border [&_.rdp-day_button:hover:not([disabled])]:bg-emerald-100 [&_.rdp-day_button:hover:not([disabled])]:text-emerald-700 [&_.rdp-day_button:focus:not([disabled])]:bg-emerald-100 [&_.rdp-day_button:focus:not([disabled])]:text-emerald-700 [&_.rdp-day_button.rdp-day_selected]:bg-emerald-600 [&_.rdp-day_button.rdp-day_selected]:text-white"
+                  classNames={{
+                    cell:
+                      "h-9 w-9 text-center text-sm p-0 relative [&:has([aria-selected])]:bg-emerald-100 [&:has([aria-selected])]:text-emerald-700 [&:has([aria-selected].day-range-end)]:rounded-r-md first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md",
+                    day_selected:
+                      "bg-emerald-600 text-white hover:bg-emerald-600 hover:text-white focus:bg-emerald-600 focus:text-white",
+                    day_range_middle:
+                      "aria-selected:bg-emerald-100 aria-selected:text-emerald-700",
+                  }}
                 />
               </PopoverContent>
             </Popover>
@@ -245,7 +253,7 @@ const Attendance = () => {
                 <SelectItem value="present" className="hover:opacity-80" style={{backgroundColor: 'rgb(209 250 229)', color: '#2C373B'}}>Present</SelectItem>
                 <SelectItem value="absent" className="hover:opacity-80" style={{backgroundColor: 'rgb(209 250 229)', color: '#2C373B'}}>Absent</SelectItem>
                 <SelectItem value="halfDay" className="hover:opacity-80" style={{backgroundColor: 'rgb(209 250 229)', color: '#2C373B'}}>Half Day</SelectItem>
-                <SelectItem value="late" className="hover:opacity-80" style={{backgroundColor: 'rgb(209 250 229)', color: '#2C373B'}}>Late</SelectItem>
+                {/* 'late' option removed as requested */}
               </SelectContent>
             </Select>
 
