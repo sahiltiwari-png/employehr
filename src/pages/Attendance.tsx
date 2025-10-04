@@ -15,7 +15,8 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
-import { getAttendance } from "@/api/attendance";
+import { getEmployeeAttendanceById } from "@/api/attendance";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface Employee {
   _id: string;
@@ -44,6 +45,7 @@ interface AttendanceResponse {
 }
 
 const Attendance = () => {
+  const { user } = useAuth();
   const [date, setDate] = useState<Date>(new Date());
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
   const [statusFilter, setStatusFilter] = useState<string | null>(null);
@@ -65,25 +67,54 @@ const Attendance = () => {
         
         // Add status filter if selected
         if (statusFilter) {
-          params.status = statusFilter.toLowerCase();
+          // Use exact status values per API spec: 'present', 'absent', 'halfDay'
+          params.status = statusFilter;
         }
 
         // Add date parameters for single date selection
         params.startDate = formattedDate;
         params.endDate = formattedDate;
 
-        // Add employee ID if selected
-        if (employeeId) {
-          params.employeeId = employeeId;
-        }
+        // Resolve employeeId from auth if not manually set
+        const id = employeeId || (user?._id || (user as any)?.id);
+        if (!id) throw new Error('Missing employeeId');
 
         // Add search query if provided
         if (searchQuery && searchQuery.trim() !== '') {
           params.search = searchQuery.trim();
         }
 
-        const data = await getAttendance(params);
-        setAttendanceData(data);
+        const response = await getEmployeeAttendanceById(id, params);
+        if (response && response.attendance) {
+          const rec = response.attendance;
+          const normalized: AttendanceResponse = {
+            page: 1,
+            limit: 10,
+            total: 1,
+            totalPages: 1,
+            items: [
+              {
+                _id: rec._id,
+                employee: {
+                  _id: rec.employeeId,
+                  name: user?.name || `${(user as any)?.firstName || ''} ${(user as any)?.lastName || ''}`.trim() || 'Employee',
+                  employeeCode: (user as any)?.employeeCode || '',
+                  designation: (user as any)?.designation || '',
+                  profilePhotoUrl: (user as any)?.profilePhotoUrl || (user as any)?.profileImage || undefined,
+                },
+                status: rec.status,
+                clockIn: rec.clockIn,
+                clockOut: rec.clockOut,
+                totalWorkingHours: typeof rec.totalWorkingHours === 'string' ? rec.totalWorkingHours : (rec.totalWorkingHours ?? null),
+                date: rec.date,
+              }
+            ]
+          };
+          setAttendanceData(normalized);
+          setError(null);
+        } else {
+          throw new Error('Invalid response');
+        }
         setError(null);
       } catch (err) {
         setError("Failed to load attendance data");
@@ -94,7 +125,7 @@ const Attendance = () => {
     };
 
     fetchAttendanceData();
-  }, [currentPage, statusFilter, date, employeeId, searchQuery]);
+  }, [currentPage, statusFilter, date, employeeId, searchQuery, user]);
 
   const getStatusBadgeClass = (status: string) => {
     switch (status.toLowerCase()) {
@@ -104,6 +135,7 @@ const Attendance = () => {
         return "bg-red-100 text-red-600";
       case "half day":
       case "half-day":
+      case "halfday":
         return "bg-yellow-100 text-yellow-700";
       case "late":
         return "bg-orange-100 text-orange-700";
@@ -209,33 +241,19 @@ const Attendance = () => {
               <table className="min-w-full text-sm">
                 <thead className="bg-gray-50 border-b">
                   <tr>
-                    <th className="px-4 py-2 text-left" style={{fontSize: '12px', fontWeight: 600, color: '#2C373B'}}>Employee</th>
+                    <th className="px-4 py-2 text-left" style={{fontSize: '12px', fontWeight: 600, color: '#2C373B'}}>Date</th>
                     <th className="px-4 py-2 text-left" style={{fontSize: '12px', fontWeight: 600, color: '#2C373B'}}>Status</th>
-                    <th className="px-4 py-2 text-left" style={{fontSize: '12px', fontWeight: 600, color: '#2C373B'}}>Clock In</th>
-                    <th className="px-4 py-2 text-left" style={{fontSize: '12px', fontWeight: 600, color: '#2C373B'}}>Clock Out</th>
+                    <th className="px-4 py-2 text-left" style={{fontSize: '12px', fontWeight: 600, color: '#2C373B'}}>Clockin</th>
+                    <th className="px-4 py-2 text-left" style={{fontSize: '12px', fontWeight: 600, color: '#2C373B'}}>Clockout</th>
+                    <th className="px-4 py-2 text-left" style={{fontSize: '12px', fontWeight: 600, color: '#2C373B'}}>Working hours</th>
+                    <th className="px-4 py-2 text-left" style={{fontSize: '12px', fontWeight: 600, color: '#2C373B'}}>Marked by</th>
                     <th className="px-4 py-2 text-left" style={{fontSize: '12px', fontWeight: 600, color: '#2C373B'}}>Actions</th>
                   </tr>
                 </thead>
                 <tbody>
                 {attendanceData.items.map((record) => (
                   <tr key={record._id} className="border-b last:border-0 hover:bg-emerald-50 transition-colors">
-                    <td className="px-4 py-2">
-                      <div className="flex items-center gap-3">
-                        <Avatar className="h-10 w-10">
-                          {record.employee.profilePhotoUrl ? (
-                            <AvatarImage src={record.employee.profilePhotoUrl} alt={record.employee.name} />
-                          ) : (
-                            <AvatarFallback>
-                              <User className="h-5 w-5" style={{color: '#2C373B'}} />
-                            </AvatarFallback>
-                          )}
-                        </Avatar>
-                        <div>
-                          <div style={{fontSize: '14px', fontWeight: 500, color: '#2C373B'}}>{record.employee.name}</div>
-                          <div className="text-xs" style={{color: '#2C373B'}}>{record.employee.designation}</div>
-                        </div>
-                      </div>
-                    </td>
+                    <td className="px-4 py-2" style={{fontSize: '14px', fontWeight: 500, color: '#2C373B'}}>{format(new Date(record.date), 'dd/MM/yyyy')}</td>
                     <td className="px-4 py-2">
                       <Badge className={cn("capitalize", getStatusBadgeClass(record.status))}>
                         {record.status}
@@ -243,6 +261,13 @@ const Attendance = () => {
                     </td>
                     <td className="px-4 py-2" style={{fontSize: '14px', fontWeight: 500, color: '#2C373B'}}>{formatTime(record.clockIn)}</td>
                     <td className="px-4 py-2" style={{fontSize: '14px', fontWeight: 500, color: '#2C373B'}}>{formatTime(record.clockOut)}</td>
+                    
+                    <td className="px-4 py-2" style={{fontSize: '14px', fontWeight: 500, color: '#2C373B'}}>
+                      {typeof record.totalWorkingHours === 'number' ? `${record.totalWorkingHours}` : (record.totalWorkingHours || '-')}
+                    </td>
+                    <td className="px-4 py-2" style={{fontSize: '14px', fontWeight: 500, color: '#2C373B'}}>
+                      {(record as any).markedBy || 'Admin'}
+                    </td>
                     <td className="px-4 py-2">
                       <Button
                         variant="link"
