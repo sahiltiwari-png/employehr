@@ -553,54 +553,66 @@ const LeavePolicy = () => {
               <div className="overflow-x-auto">
                 <Table>
                   <TableHeader>
-                    <TableRow>
-                      <TableHead style={{fontSize: '12px', fontWeight: '600'}}>Leave Type</TableHead>
-                      <TableHead style={{fontSize: '12px', fontWeight: '600'}}>Limit</TableHead>
-                      <TableHead style={{fontSize: '12px', fontWeight: '600'}}>Interval</TableHead>
-                      <TableHead style={{fontSize: '12px', fontWeight: '600'}}>Carry Forward</TableHead>
-                      <TableHead style={{fontSize: '12px', fontWeight: '600'}}>Encashment</TableHead>
-                      <TableHead style={{fontSize: '12px', fontWeight: '600'}}>Probation</TableHead>
-                      <TableHead style={{fontSize: '12px', fontWeight: '600'}}>Min Work Days</TableHead>
-                      <TableHead style={{fontSize: '12px', fontWeight: '600'}}>Actions</TableHead>
+                    <TableRow className="bg-[#2C373B]">
+                      <TableHead className="text-white" style={{fontSize: '12px', fontWeight: 600}}>Leave Types</TableHead>
+                      <TableHead className="text-white" style={{fontSize: '12px', fontWeight: 600}}>Leave cycle</TableHead>
+                      <TableHead className="text-white" style={{fontSize: '12px', fontWeight: 600}}>Leave days</TableHead>
+                      <TableHead className="text-white" style={{fontSize: '12px', fontWeight: 600}}>Carry Forward</TableHead>
+                      <TableHead className="text-white" style={{fontSize: '12px', fontWeight: 600}}>Encashment</TableHead>
+                      <TableHead className="text-white" style={{fontSize: '12px', fontWeight: 600}}>Probation Applicable</TableHead>
+                      <TableHead className="text-white" style={{fontSize: '12px', fontWeight: 600}}>Continuous days(Min)</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {policies.map((policy) =>
-                      policy.leaveTypes.map((leaveType, index) => (
-                        <TableRow key={`${policy._id}-${index}`}>
-                          <TableCell className="capitalize" style={{fontSize: '14px', fontWeight: '500', color: '#2C373B'}}>
-                            {leaveType.type}
-                          </TableCell>
-                          <TableCell style={{fontSize: '14px', fontWeight: '500', color: '#2C373B'}}>{leaveType.intervalValue}</TableCell>
-                          <TableCell className="capitalize" style={{fontSize: '14px', fontWeight: '500', color: '#2C373B'}}>
-                            {leaveType.interval}
-                          </TableCell>
-                          <TableCell style={{fontSize: '14px', fontWeight: '500', color: '#2C373B'}}>
-                            {leaveType.carryForward ? "Yes" : "No"}
-                          </TableCell>
-                          <TableCell style={{fontSize: '14px', fontWeight: '500', color: '#2C373B'}}>
-                            {leaveType.encashable ? "Yes" : "No"}
-                          </TableCell>
-                          <TableCell style={{fontSize: '14px', fontWeight: '500', color: '#2C373B'}}>
-                            {leaveType.probationApplicable ? "Yes" : "No"}
-                          </TableCell>
-                          <TableCell style={{fontSize: '14px', fontWeight: '500', color: '#2C373B'}}>
-                            {leaveType.minContinuousWorkDays || "N/A"}
-                          </TableCell>
-                          <TableCell>
-                            <div className="flex space-x-2">
-                              <Button 
-                                variant="outline" 
-                                size="sm"
-                                onClick={() => handleEditPolicy(policy._id)}
-                                style={{backgroundColor: '#4CDC9C', color: '#2C373B'}}
-                              >
-                                <Edit className="w-4 h-4" />
-                              </Button>
-                            </div>
-                          </TableCell>
-                        </TableRow>
-                      ))
+                      policy.leaveTypes.map((leaveType, index) => {
+                        const typeBgClass = (() => {
+                          switch ((leaveType.type || '').toLowerCase()) {
+                            case 'casual':
+                              return 'bg-green-50';
+                            case 'earned':
+                              return 'bg-rose-50';
+                            case 'medical':
+                              return 'bg-yellow-50';
+                            case 'maternity':
+                              return 'bg-purple-50';
+                            case 'paternity':
+                              return 'bg-blue-50';
+                            default:
+                              return 'bg-gray-100';
+                          }
+                        })();
+                        return (
+                          <TableRow key={`${policy._id}-${index}`}>
+                            {/* Leave Types (colored cell) */}
+                            <TableCell className={`capitalize ${typeBgClass}`} style={{fontSize: '14px', fontWeight: 500, color: '#2C373B'}}>
+                              {leaveType.type}
+                            </TableCell>
+                            {/* Leave cycle (interval) */}
+                            <TableCell className="capitalize" style={{fontSize: '14px', fontWeight: 500, color: '#2C373B'}}>
+                              {leaveType.interval}
+                            </TableCell>
+                            {/* Leave days (limit) */}
+                            <TableCell style={{fontSize: '14px', fontWeight: 500, color: '#2C373B'}}>{leaveType.intervalValue}</TableCell>
+                            {/* Carry Forward */}
+                            <TableCell style={{fontSize: '14px', fontWeight: 500, color: '#2C373B'}}>
+                              {leaveType.carryForward ? 'Yes' : 'No'}
+                            </TableCell>
+                            {/* Encashment */}
+                            <TableCell style={{fontSize: '14px', fontWeight: 500, color: '#2C373B'}}>
+                              {leaveType.encashable ? 'Yes' : 'No'}
+                            </TableCell>
+                            {/* Probation Applicable */}
+                            <TableCell style={{fontSize: '14px', fontWeight: 500, color: '#2C373B'}}>
+                              {leaveType.probationApplicable ? 'Yes' : 'No'}
+                            </TableCell>
+                            {/* Continuous days(Min) */}
+                            <TableCell style={{fontSize: '14px', fontWeight: 500, color: '#2C373B'}}>
+                              {leaveType.minContinuousWorkDays || 'N/A'}
+                            </TableCell>
+                          </TableRow>
+                        );
+                      })
                     )}
                   </TableBody>
                 </Table>

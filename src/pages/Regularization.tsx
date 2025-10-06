@@ -13,6 +13,7 @@ import {
   AvatarFallback,
   AvatarImage,
 } from "@/components/ui/avatar";
+import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
 import { Input } from "@/components/ui/input";
 
 import { Label } from "@/components/ui/label";
@@ -543,9 +544,18 @@ const Regularization = () => {
                           <div className="text-[14px] font-medium text-[#2C373B] truncate">
                             {req.employeeId.firstName} {req.employeeId.lastName}
                           </div>
-                          <div className="text-[14px] font-medium text-[#2C373B] truncate">
-                            {req.employeeId.employeeCode}
-                          </div>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <div className="text-[14px] font-medium text-[#2C373B] truncate" title={req.employeeId.designation || ''}>
+                                {req.employeeId.designation || ''}
+                              </div>
+                            </TooltipTrigger>
+                            <TooltipContent side="top">
+                              <span className="text-sm" style={{ color: '#2C373B' }}>
+                                {req.employeeId.designation || 'No designation'}
+                              </span>
+                            </TooltipContent>
+                          </Tooltip>
                         </div>
                       </div>
                     </td>
@@ -735,9 +745,18 @@ const Regularization = () => {
                         <span className="font-medium">
                           {formSelectedEmployee.firstName} {formSelectedEmployee.lastName}
                         </span>
-                        <span className="text-emerald-600 text-xs">
-                          ({formSelectedEmployee.employeeCode})
-                        </span>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <span className="text-emerald-600 text-xs truncate max-w-[160px]">
+                              {formSelectedEmployee.designation || ''}
+                            </span>
+                          </TooltipTrigger>
+                          <TooltipContent side="top">
+                            <span className="text-sm" style={{ color: '#2C373B' }}>
+                              {formSelectedEmployee.designation || 'No designation'}
+                            </span>
+                          </TooltipContent>
+                        </Tooltip>
                         {!isPrefilledCurrentUser && (
                           <button
                             type="button"
