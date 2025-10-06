@@ -53,11 +53,6 @@ const navigation: NavigationItem[] = [
   ] },
   { title: "Salary Structure", url: "/salary-slips", icon: FileText },
   { title: "Payroll", url: "/payroll", icon: FileText },
-  { title: "Reports", url: "/reports", icon: FileText, hasSubmenu: true, submenu: [
-    { title: "Employees Report", url: "/reports/employees" },
-    { title: "Leave Requests Report", url: "/reports/leave-requests" },
-    { title: "Payroll Report", url: "/reports/payroll" }
-  ] },
   { title: "Settings", url: "/settings", icon: Settings },
 ];
 
