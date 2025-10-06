@@ -502,9 +502,7 @@ const Regularization = () => {
                    <th className="px-3 py-3 text-left text-[12px] font-semibold text-[#2C373B] w-[12%]">
                      Remarks
                    </th>
-                   <th className="px-3 py-3 text-left text-[12px] font-semibold text-[#2C373B] w-[10%]">
-                     Actions
-                   </th>
+                   
                 </tr>
               </thead>
 
@@ -512,7 +510,7 @@ const Regularization = () => {
                 {filteredRequests.length === 0 && (
                    <tr>
                      <td
-                       colSpan={8}
+                       colSpan={7}
                        className="px-4 py-6 text-center text-gray-600"
                      >
                        No regularization requests found
@@ -628,43 +626,7 @@ const Regularization = () => {
                       )}
                     </td>
 
-                    {/* Actions */}
-                    <td className="px-3 py-3">
-                      {editingRows.has(req._id) ? (
-                        <div className="flex gap-1">
-                          <Button
-                            size="sm"
-                            onClick={() => handleSave(req._id)}
-                            disabled={updating.has(req._id)}
-                            className="h-7 px-2 text-xs bg-[#4CDC9C] hover:bg-[#43c58d] text-[#2C373B]"
-                          >
-                            {updating.has(req._id) ? (
-                              <div className="animate-spin h-3 w-3 border border-white border-t-transparent rounded-full" />
-                            ) : (
-                              'Update'
-                            )}
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => handleCancel(req._id)}
-                            disabled={updating.has(req._id)}
-                            className="h-7 px-2 text-xs bg-[#4CDC9C] border-[#4CDC9C] text-[#2C373B] hover:bg-[#43c58d]"
-                          >
-                            Cancel
-                          </Button>
-                        </div>
-                      ) : (
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => handleEdit(req._id, req.status, req.remarks || '')}
-                          className="text-[#2C373B] border-[#4CDC9C] bg-[#4CDC9C] hover:bg-[#43c58d] h-7 px-2 text-xs"
-                        >
-                          Edit
-                        </Button>
-                      )}
-                    </td>
+                    
                   </tr>
                 ))}
               </tbody>
