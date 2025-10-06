@@ -8,6 +8,17 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ChevronLeft, ChevronRight, User } from "lucide-react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogCancel,
+  AlertDialogAction,
+} from "@/components/ui/alert-dialog";
+import { toast } from "@/hooks/use-toast";
 
 const statusOptions = [
   { label: "Applied", value: "applied" },
@@ -23,6 +34,9 @@ const TrackLeaveRequest = () => {
   const [status, setStatus] = useState<string>("");
   const [leaveType, setLeaveType] = useState<string>("");
   const [leavePolicies, setLeavePolicies] = useState<LeavePolicy[]>([]);
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [cancelId, setCancelId] = useState<string | null>(null);
+  const [confirmLoading, setConfirmLoading] = useState(false);
   const truncatePreview = (text: string, maxWords: number = 8) => {
     const words = (text || '').trim().split(/\s+/).filter(Boolean);
     if (words.length <= maxWords) return text || '';
@@ -100,6 +114,27 @@ const TrackLeaveRequest = () => {
   };
   const handleNext = () => {
     if (page < totalPages) fetchRequests(page + 1);
+  };
+
+  const handleConfirmCancel = async () => {
+    if (!cancelId) return;
+    try {
+      setConfirmLoading(true);
+      const res = await cancelLeaveRequest(cancelId);
+      await fetchRequests(page);
+      setConfirmOpen(false);
+      setCancelId(null);
+      toast({ title: "Cancelled", description: res?.message || "Request cancelled successfully" });
+    } catch (err: any) {
+      console.error("Cancel failed", err);
+      toast({
+        title: "Cancel failed",
+        description: err?.response?.data?.message || "Could not cancel the request",
+        variant: "destructive",
+      });
+    } finally {
+      setConfirmLoading(false);
+    }
   };
 
   return (
@@ -213,24 +248,15 @@ const TrackLeaveRequest = () => {
                       </TableCell>
                       <TableCell>
                         {["pending", "applied"].includes((req.status || '').toLowerCase()) ? (
-                          <Button
-                            size="sm"
-                            className="bg-red-500 hover:bg-red-600 text-white"
-                            onClick={async () => {
-                              const ok = window.confirm("Are you sure you want to cancel this request?");
-                              if (!ok) return;
-                              try {
-                                await cancelLeaveRequest(req._id);
-                                await fetchRequests(page);
-                                alert("Request cancelled successfully");
-                              } catch (err: any) {
-                                console.error("Cancel failed", err);
-                                alert(err?.response?.data?.message || "Cancel failed");
-                              }
+                          <button
+                            className="text-blue-600 hover:underline"
+                            onClick={() => {
+                              setCancelId(req._id);
+                              setConfirmOpen(true);
                             }}
                           >
-                            Cancel
-                          </Button>
+                            Cancel request
+                          </button>
                         ) : (
                           <span className="text-gray-400">-</span>
                         )}
@@ -262,6 +288,26 @@ const TrackLeaveRequest = () => {
           </div>
         </div>
       </div>
+      {/* Cancel confirmation modal */}
+      <AlertDialog open={confirmOpen} onOpenChange={(o) => setConfirmOpen(o)}>
+        <AlertDialogContent className="sm:max-w-md">
+          <AlertDialogHeader>
+            <AlertDialogTitle>Cancel leave request?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action will cancel your leave request. Do you want to continue?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={confirmLoading}>No</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleConfirmCancel}
+              disabled={confirmLoading}
+            >
+              {confirmLoading ? "Cancelling..." : "Yes, cancel"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
       </TooltipProvider>
     </div>
   );
