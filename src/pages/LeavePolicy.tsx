@@ -402,7 +402,7 @@ const LeavePolicy = () => {
   const monthEndLabel = new Date(now.getFullYear(), now.getMonth() + 1, 0).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-emerald-200 via-emerald-100 to-emerald-50 px-2 sm:px-4 md:px-6 py-6">
+    <div className="min-h-screen bg-gradient-to-br from-emerald-200 via-emerald-100 to-emerald-50 px-1 sm:px-3 md:px-6 py-4">
       <div className="w-full space-y-6">
         <div className="flex flex-col md:flex-row justify-between md:items-center gap-4">
           <h1 className="text-xl font-semibold tracking-wide" style={{color: '#2C373B'}}>Review the policy information and manage leave types</h1>
@@ -546,13 +546,13 @@ const LeavePolicy = () => {
           </Card>
         ) : (
           <Card className="shadow-lg rounded-2xl">
-            <CardHeader>
+            <CardHeader className="px-3 py-3 sm:px-5 sm:py-5">
               <CardTitle>Existing Leave Policies</CardTitle>
             </CardHeader>
-            <CardContent>
+            <CardContent className="px-3 sm:px-5 pt-0">
               {/* Banner above table */}
               <div className="mb-4">
-                <div className="bg-[#2C373B] text-white rounded-2xl px-4 py-4 md:px-6 md:py-5 flex items-start justify-between">
+                <div className="bg-[#2C373B] text-white rounded-2xl px-3 py-4 md:px-6 md:py-5 flex items-start justify-between">
                   <div className="space-y-1">
                     <div className="text-sm md:text-base font-medium">Leave Policy details</div>
                     <div className="space-y-0.5">
