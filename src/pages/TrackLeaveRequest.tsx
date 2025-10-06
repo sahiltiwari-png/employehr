@@ -85,10 +85,18 @@ const TrackLeaveRequest = () => {
       const id = (user as any)?._id || (user as any)?.id;
       if (!id) return;
       setLoading(true);
-      const res = await getLeaveRequests(p, limit, status || undefined, [id]);
-      const filtered = leaveType ? res.items.filter((i) => i.leaveType === leaveType) : res.items;
+      const res = await getLeaveRequests(
+        p,
+        limit,
+        status || undefined,
+        [id],
+        leaveType ? (leaveType || '').toLowerCase() : undefined
+      );
+      const filtered = leaveType
+        ? res.items.filter((i) => (i.leaveType || '').toLowerCase() === (leaveType || '').toLowerCase())
+        : res.items;
       setRequests(filtered);
-      setTotal(res.total);
+      setTotal(filtered.length);
       setPage(p);
     } catch (e) {
       console.error(e);
@@ -169,7 +177,7 @@ const TrackLeaveRequest = () => {
                   <div className="px-2 py-2 text-sm text-gray-500" role="none">No leave types</div>
                 ) : (
                   leaveTypeItems.map((t) => (
-                    <SelectItem key={t} value={t}>{t}</SelectItem>
+                    <SelectItem key={t} value={(t || '').toLowerCase()}>{t}</SelectItem>
                   ))
                 )}
               </SelectContent>
