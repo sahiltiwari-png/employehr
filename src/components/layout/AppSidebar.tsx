@@ -52,7 +52,8 @@ const navigation: NavigationItem[] = [
     { title: "Leave Policy", url: "/leaves/policy" },
     { title: "Leave Balance", url: "/leaves/balance" },
     { title: "Leave Allotment", url: "/leaves/allotment" },
-    { title: "Leave Requests", url: "/leaves/requests" }
+    { title: "Leave Requests", url: "/leaves/requests" },
+    { title: "Apply Leave", url: "/apply-leave" }
   ] },
   { title: "Reports", url: "/reports", icon: FileText, hasSubmenu: true, submenu: [
     { title: "Employees Report", url: "/reports/employees" },
