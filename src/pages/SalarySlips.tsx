@@ -325,7 +325,7 @@ const SalarySlip = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-emerald-200 via-emerald-100 to-emerald-50 p-6">
+    <div className="min-h-screen bg-gradient-to-br from-emerald-200 via-emerald-100 to-emerald-50 px-3 sm:px-6 py-6">
       <div className="max-w-6xl mx-auto">
         {/* Header */}
         <div className="flex items-start justify-between mb-1">
@@ -342,8 +342,8 @@ const SalarySlip = () => {
         </div>
         <div className="h-4" />
 
-        {/* Salary Card */}
-        <div className="bg-white rounded-xl shadow-md border p-6">
+        {/* Salary Card with clear border and tighter mobile padding */}
+        <div className="bg-white rounded-2xl border border-[#2C373B] p-4 sm:p-6">
           {myLoading ? (
             <div className="flex justify-center items-center p-8">
               <p className="text-sm" style={{color: '#2C373B'}}>Loading...</p>
@@ -370,7 +370,7 @@ const SalarySlip = () => {
               {/* Metrics row */}
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 mb-6">
                 {/* CTC Card */}
-                <div className="bg-[#2C373B] text-white rounded-2xl px-5 py-4 flex items-center justify-between">
+                <div className="bg-[#2C373B] text-white rounded-2xl px-4 sm:px-5 py-3.5 sm:py-4 flex items-center justify-between">
                   <div className="flex items-center gap-4">
                     {/* Green circular badge with inner circle and gold icon */}
                     <div className="relative flex items-center justify-center h-9 w-9 rounded-full bg-emerald-500/90">
@@ -384,7 +384,7 @@ const SalarySlip = () => {
                 </div>
 
                 {/* Gross Monthly Salary Card */}
-                <div className="bg-[#2C373B] text-white rounded-2xl px-5 py-4 flex items-center justify-between">
+                <div className="bg-[#2C373B] text-white rounded-2xl px-4 sm:px-5 py-3.5 sm:py-4 flex items-center justify-between">
                   <div className="flex items-center gap-4">
                     <div className="relative flex items-center justify-center h-9 w-9 rounded-full bg-emerald-500/90">
                       <div className="h-7 w-7 rounded-full bg-[#1F2A31] flex items-center justify-center">
@@ -400,7 +400,7 @@ const SalarySlip = () => {
                 </div>
 
                 {/* Net Pay Card */}
-                <div className="bg-[#2C373B] text-white rounded-2xl px-5 py-4 flex items-center justify-between">
+                <div className="bg-[#2C373B] text-white rounded-2xl px-4 sm:px-5 py-3.5 sm:py-4 flex items-center justify-between">
                   <div className="flex items-center gap-4">
                     <div className="relative flex items-center justify-center h-9 w-9 rounded-full bg-emerald-500/90">
                       <div className="h-7 w-7 rounded-full bg-[#1F2A31] flex items-center justify-center">
