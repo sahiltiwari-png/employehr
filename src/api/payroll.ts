@@ -194,3 +194,26 @@ export const downloadPayrollReport = async (params?: {
   });
   return res;
 };
+
+// Employee-specific payroll list (skip/limit with optional month/year filters)
+export interface PayrollEmployeeListResponse {
+  message: string;
+  success: boolean;
+  data: PayrollItem[];
+}
+
+export const getEmployeePayrollList = async (
+  employeeId: string,
+  params?: { skip?: number; limit?: number; month?: number; year?: number }
+) => {
+  const query: string[] = [];
+  if (params) {
+    if (typeof params.skip !== 'undefined') query.push(`skip=${params.skip}`);
+    if (typeof params.limit !== 'undefined') query.push(`limit=${params.limit}`);
+    if (typeof params.month !== 'undefined') query.push(`month=${params.month}`);
+    if (typeof params.year !== 'undefined') query.push(`year=${params.year}`);
+  }
+  const qs = query.length ? `?${query.join('&')}` : '';
+  const res = await API.get(`/payroll/employee/${employeeId}${qs}`);
+  return res.data as PayrollEmployeeListResponse;
+};
