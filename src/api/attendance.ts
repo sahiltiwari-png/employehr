@@ -43,6 +43,26 @@ export const getEmployeeAttendanceById = async (employeeId: string, params?: any
   }
 };
 
+export const downloadAttendanceReport = async (params?: {
+  employeeId?: string;
+  startDate?: string;
+  endDate?: string;
+  status?: string;
+}) => {
+  const query: string[] = [];
+  if (params) {
+    if (params.employeeId) query.push(`employeeId=${params.employeeId}`);
+    if (params.startDate) query.push(`startDate=${params.startDate}`);
+    if (params.endDate) query.push(`endDate=${params.endDate}`);
+    if (params.status) query.push(`status=${params.status}`);
+  }
+  const qs = query.length ? `?${query.join('&')}` : '';
+  const response = await API.get(`/reports/attendance/download${qs}`, {
+    responseType: 'blob',
+  });
+  return response;
+};
+
 export const updateAttendance = async (employeeId: string, attendanceId: string, data: {
   clockIn: string;
   clockOut: string;

@@ -16,6 +16,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { getAttendance } from "@/api/attendance";
+import { downloadAttendanceReport } from "@/api/attendance";
 import { useAuth } from "@/contexts/AuthContext";
 
 interface Employee {
@@ -197,6 +198,45 @@ const Attendance = () => {
     setCurrentPage(1);
   };
 
+  const handleExportAll = async () => {
+    try {
+      const id = employeeId || (user?._id || (user as any)?.id);
+      if (!id) {
+        throw new Error('Missing employeeId');
+      }
+
+      const params: any = { employeeId: id };
+      if (dateRange.startDate) params.startDate = format(dateRange.startDate, 'yyyy-MM-dd');
+      if (dateRange.endDate) params.endDate = format(dateRange.endDate, 'yyyy-MM-dd');
+      if (statusFilter) params.status = statusFilter;
+
+      const response = await downloadAttendanceReport(params);
+
+      const blob = new Blob([response.data], { 
+        type: response.headers['content-type'] || 'application/octet-stream' 
+      });
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+
+      const cd = response.headers['content-disposition'];
+      let filename = 'attendance-report.xlsx';
+      if (cd) {
+        const match = cd.match(/filename="?([^"]+)"?/);
+        if (match) filename = match[1];
+      }
+
+      link.setAttribute('download', filename);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+    } catch (e) {
+      console.error('Export error:', e);
+      alert('Failed to export attendance report');
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-emerald-200 via-emerald-100 to-emerald-50 p-6">
       <div className="max-w-6xl mx-auto">
@@ -264,6 +304,15 @@ const Attendance = () => {
               onClick={handleClearFilters}
             >
               Clear filters
+            </Button>
+          </div>
+          <div className="flex gap-2">
+            <Button
+              className="text-sm h-8"
+              style={{backgroundColor: '#4CDC9C', color: '#2C373B'}}
+              onClick={handleExportAll}
+            >
+              Export All
             </Button>
           </div>
         </div>
