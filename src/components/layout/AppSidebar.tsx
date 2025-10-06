@@ -50,6 +50,7 @@ const navigation: NavigationItem[] = [
   { title: "Attendance", url: "/attendance", icon: Clock },
   { title: "Leaves", url: "/leaves", icon: Calendar, hasSubmenu: true, submenu: [
     { title: "Leave Policy", url: "/leaves/policy" },
+    { title: "Leave Balance", url: "/leaves/balance" },
     { title: "Leave Allotment", url: "/leaves/allotment" },
     { title: "Leave Requests", url: "/leaves/requests" }
   ] },
