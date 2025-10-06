@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { getLeaveRequests, LeaveRequest } from "@/api/leaves";
+import { getLeavePolicies, LeavePolicy } from "@/api/leavePolicy";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -8,23 +9,32 @@ import { ChevronLeft, ChevronRight, User } from "lucide-react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
 const statusOptions = [
-  { label: "All", value: "all" },
+  { label: "Applied", value: "applied" },
   { label: "Approved", value: "approved" },
-  { label: "Declined", value: "rejected" },
-  { label: "Pending", value: "applied" },
+  { label: "Rejected", value: "rejected" },
+  { label: "Cancelled", value: "cancelled" },
 ];
 
-const leaveTypeOptions = [
-  { label: "All", value: "all" },
-  { label: "Sick", value: "sick" },
-  { label: "Casual", value: "casual" },
-  { label: "Earned", value: "earned" },
-];
+const ALLOWED_TYPES = ["casual", "medical", "earned", "maternity", "paternity", "other", "sick"];
 
 const TrackLeaveRequest = () => {
   const { user } = useAuth();
-  const [status, setStatus] = useState("all");
-  const [leaveType, setLeaveType] = useState("all");
+  const [status, setStatus] = useState<string>("");
+  const [leaveType, setLeaveType] = useState<string>("");
+  const [leavePolicies, setLeavePolicies] = useState<LeavePolicy[]>([]);
+  const leaveTypeItems = useMemo(() => {
+    const items: string[] = [];
+    leavePolicies.forEach((p) => {
+      p.leaveTypes.forEach((lt) => {
+        const t = (lt.type || '').toLowerCase();
+        if (ALLOWED_TYPES.includes(t)) {
+          items.push(lt.type);
+        }
+      });
+    });
+    // Deduplicate
+    return Array.from(new Set(items));
+  }, [leavePolicies]);
   const [requests, setRequests] = useState<LeaveRequest[]>([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
@@ -55,8 +65,8 @@ const TrackLeaveRequest = () => {
       const id = (user as any)?._id || (user as any)?.id;
       if (!id) return;
       setLoading(true);
-      const res = await getLeaveRequests(p, limit, status !== "all" ? status : undefined, [id]);
-      const filtered = leaveType === "all" ? res.items : res.items.filter((i) => i.leaveType === leaveType);
+      const res = await getLeaveRequests(p, limit, status || undefined, [id]);
+      const filtered = leaveType ? res.items.filter((i) => i.leaveType === leaveType) : res.items;
       setRequests(filtered);
       setTotal(res.total);
       setPage(p);
@@ -64,6 +74,18 @@ const TrackLeaveRequest = () => {
       console.error(e);
     } finally {
       setLoading(false);
+    }
+  };
+
+  // Load leave types when dropdown opens
+  const handleLeaveTypeOpen = async (open: boolean) => {
+    if (!open) return;
+    try {
+      const res = await getLeavePolicies();
+      const policies = Array.isArray(res?.data) ? res.data : [];
+      setLeavePolicies(policies);
+    } catch (err) {
+      console.error('Failed to load leave policies', err);
     }
   };
 
@@ -81,21 +103,8 @@ const TrackLeaveRequest = () => {
       <div className="bg-white rounded-2xl shadow-md border p-4 lg:p-6">
         {/* Header with avatar, name and filters */}
         <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4 mb-6">
-          <div className="flex items-center gap-3">
-            <Avatar className="h-10 w-10">
-              {(user as any)?.profilePhotoUrl || (user as any)?.profileImage ? (
-                <AvatarImage src={(user as any)?.profilePhotoUrl || (user as any)?.profileImage} alt={`${(user as any)?.firstName || ""} ${(user as any)?.lastName || ""}`} />
-              ) : (
-                <AvatarFallback className="bg-emerald-100 text-emerald-700">
-                  <User className="h-4 w-4" />
-                </AvatarFallback>
-              )}
-            </Avatar>
-            <div>
-              <div className="font-semibold" style={{ color: "#2C373B" }}>{(user as any)?.firstName || (user as any)?.name || ""} {(user as any)?.lastName || ""}</div>
-              <div className="text-sm text-gray-500">{(user as any)?.designation || ""}</div>
-            </div>
-          </div>
+          {/* Avatar removed per request */}
+          <div className="flex-1"></div>
 
           <div className="flex items-center gap-4">
             <Select value={status} onValueChange={setStatus}>
@@ -109,18 +118,22 @@ const TrackLeaveRequest = () => {
               </SelectContent>
             </Select>
 
-            <Select value={leaveType} onValueChange={setLeaveType}>
+            <Select onOpenChange={handleLeaveTypeOpen} value={leaveType} onValueChange={setLeaveType}>
               <SelectTrigger className="w-44 h-8 rounded-lg border border-[#9AE6B4] bg-[rgb(209,250,229)] text-[#2C373B]">
                 <SelectValue placeholder="Leave type" />
               </SelectTrigger>
               <SelectContent>
-                {leaveTypeOptions.map((o) => (
-                  <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>
-                ))}
+                {leaveTypeItems.length === 0 ? (
+                  <div className="px-2 py-2 text-sm text-gray-500" role="none">No leave types</div>
+                ) : (
+                  leaveTypeItems.map((t) => (
+                    <SelectItem key={t} value={t}>{t}</SelectItem>
+                  ))
+                )}
               </SelectContent>
             </Select>
 
-            <button className="text-emerald-600 font-medium hover:underline" onClick={() => { setStatus("all"); setLeaveType("all"); fetchRequests(1); }}>Clear filters</button>
+            <button className="text-emerald-600 font-medium hover:underline" onClick={() => { setStatus(""); setLeaveType(""); fetchRequests(1); }}>Clear filters</button>
           </div>
         </div>
 
@@ -163,7 +176,7 @@ const TrackLeaveRequest = () => {
                       <TableCell style={{fontSize: '14px', fontWeight: 500, color: '#2C373B'}}>{endFmt}</TableCell>
                       <TableCell style={{fontSize: '14px', fontWeight: 500, color: '#2C373B'}}>{req.reason}</TableCell>
                       <TableCell style={{fontSize: '14px', fontWeight: 500, color: '#2C373B'}}>{req.days} days</TableCell>
-                      <TableCell className={`font-medium ${statusColor}`}>{req.status === "applied" ? "Pending" : req.status === "rejected" ? "Declined" : req.status === "approved" ? "Approved" : req.status}</TableCell>
+                      <TableCell className={`font-medium ${statusColor}`}>{req.status}</TableCell>
                       <TableCell className="text-gray-500">{req.remarks || "-"}</TableCell>
                       <TableCell>
                         {req.status === "applied" ? (
