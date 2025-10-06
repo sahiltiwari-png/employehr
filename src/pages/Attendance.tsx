@@ -364,7 +364,7 @@ const Attendance = () => {
                         variant="ghost"
                         size="sm"
                         className="px-3 py-1 rounded-md text-xs font-semibold"
-                        style={{ backgroundColor: '#4582F5', color: '#ffffff' }}
+                        style={{ backgroundColor: '#4CDC9C', color: '#2C373B' }}
                         onClick={() =>
                           navigate('/regularization/submit', {
                             state: {
