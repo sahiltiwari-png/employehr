@@ -455,6 +455,30 @@ const Payroll = () => {
               </tbody>
             </table>
           </div>
+          {(() => {
+            const showPagination = employeeRows.length === 10 || currentPage > 1;
+            return showPagination ? (
+              <div className="flex items-center justify-end gap-3 px-4 py-3 border-t bg-gray-50">
+                <Button
+                  variant="outline"
+                  disabled={loading || currentPage === 1}
+                  onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                  className="text-[#2C373B]"
+                >
+                  Previous
+                </Button>
+                <span className="text-sm text-[#2C373B]">Page {currentPage}</span>
+                <Button
+                  variant="outline"
+                  disabled={loading || employeeRows.length < 10}
+                  onClick={() => setCurrentPage((p) => p + 1)}
+                  className="text-[#2C373B]"
+                >
+                  Next
+                </Button>
+              </div>
+            ) : null;
+          })()}
         </div>
       </div>
       {/* Create Payroll Modal */}
