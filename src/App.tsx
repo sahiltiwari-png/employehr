@@ -14,6 +14,7 @@ import Attendance from "./pages/Attendance";
 import Leaves from "./pages/Leaves";
 import LeavePolicy from "./pages/LeavePolicy";
 import LeaveRequests from "./pages/LeaveRequests";
+import TrackLeaveRequest from "./pages/TrackLeaveRequest";
 import LeaveAllotment from "./pages/LeaveAllotment";
 import LeaveAllotmentHistory from "./pages/LeaveAllotmentHistory";
 import LeaveBalance from "./pages/LeaveBalance";
@@ -76,6 +77,7 @@ const App = () => (
                       <Route path="/leaves" element={<Leaves />} />
                       <Route path="/leaves/policy" element={<LeavePolicy />} />
                       <Route path="/leaves/requests" element={<LeaveRequests />} />
+                      <Route path="/leaves/track" element={<TrackLeaveRequest />} />
                       <Route path="/leaves/allotment" element={<LeaveAllotment />} />
                       <Route path="/leaves/balance" element={<LeaveBalance />} />
                       <Route path="/leaves/allotment/history/:employeeId" element={<LeaveAllotmentHistory />} />
