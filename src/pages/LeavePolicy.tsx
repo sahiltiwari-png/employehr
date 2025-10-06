@@ -553,14 +553,14 @@ const LeavePolicy = () => {
               <div className="overflow-x-auto">
                 <Table>
                   <TableHeader>
-                    <TableRow className="bg-[#2C373B]">
-                      <TableHead className="text-white" style={{fontSize: '12px', fontWeight: 600}}>Leave Types</TableHead>
-                      <TableHead className="text-white" style={{fontSize: '12px', fontWeight: 600}}>Leave cycle</TableHead>
-                      <TableHead className="text-white" style={{fontSize: '12px', fontWeight: 600}}>Leave days</TableHead>
-                      <TableHead className="text-white" style={{fontSize: '12px', fontWeight: 600}}>Carry Forward</TableHead>
-                      <TableHead className="text-white" style={{fontSize: '12px', fontWeight: 600}}>Encashment</TableHead>
-                      <TableHead className="text-white" style={{fontSize: '12px', fontWeight: 600}}>Probation Applicable</TableHead>
-                      <TableHead className="text-white" style={{fontSize: '12px', fontWeight: 600}}>Continuous days(Min)</TableHead>
+                    <TableRow className="bg-[#2C373B] hover:bg-[#2C373B]">
+                      <TableHead className="text-white hover:text-white" style={{fontSize: '12px', fontWeight: 600}}>Leave Types</TableHead>
+                      <TableHead className="text-white hover:text-white" style={{fontSize: '12px', fontWeight: 600}}>Leave cycle</TableHead>
+                      <TableHead className="text-white hover:text-white" style={{fontSize: '12px', fontWeight: 600}}>Leave days</TableHead>
+                      <TableHead className="text-white hover:text-white" style={{fontSize: '12px', fontWeight: 600}}>Carry Forward</TableHead>
+                      <TableHead className="text-white hover:text-white" style={{fontSize: '12px', fontWeight: 600}}>Encashment</TableHead>
+                      <TableHead className="text-white hover:text-white" style={{fontSize: '12px', fontWeight: 600}}>Probation Applicable</TableHead>
+                      <TableHead className="text-white hover:text-white" style={{fontSize: '12px', fontWeight: 600}}>Continuous days(Min)</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -569,17 +569,20 @@ const LeavePolicy = () => {
                         const typeBgClass = (() => {
                           switch ((leaveType.type || '').toLowerCase()) {
                             case 'casual':
-                              return 'bg-green-50';
+                              return 'bg-green-300';
                             case 'earned':
-                              return 'bg-rose-50';
+                              return 'bg-rose-300';
                             case 'medical':
-                              return 'bg-yellow-50';
+                              return 'bg-yellow-300';
                             case 'maternity':
-                              return 'bg-purple-50';
+                              return 'bg-violet-300';
                             case 'paternity':
-                              return 'bg-blue-50';
+                              return 'bg-sky-300';
+                            case 'other':
+                            case 'others':
+                              return 'bg-gray-300';
                             default:
-                              return 'bg-gray-100';
+                              return 'bg-gray-300';
                           }
                         })();
                         return (
