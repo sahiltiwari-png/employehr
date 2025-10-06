@@ -1,12 +1,13 @@
 import { useEffect, useMemo, useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
-import { getLeaveRequests, LeaveRequest } from "@/api/leaves";
+import { getLeaveRequests, LeaveRequest, cancelLeaveRequest } from "@/api/leaves";
 import { getLeavePolicies, LeavePolicy } from "@/api/leavePolicy";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ChevronLeft, ChevronRight, User } from "lucide-react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 const statusOptions = [
   { label: "Applied", value: "applied" },
@@ -22,6 +23,11 @@ const TrackLeaveRequest = () => {
   const [status, setStatus] = useState<string>("");
   const [leaveType, setLeaveType] = useState<string>("");
   const [leavePolicies, setLeavePolicies] = useState<LeavePolicy[]>([]);
+  const truncatePreview = (text: string, maxWords: number = 8) => {
+    const words = (text || '').trim().split(/\s+/).filter(Boolean);
+    if (words.length <= maxWords) return text || '';
+    return `${words.slice(0, maxWords).join(' ')}...`;
+  };
   const leaveTypeItems = useMemo(() => {
     const items: string[] = [];
     leavePolicies.forEach((p) => {
@@ -97,7 +103,8 @@ const TrackLeaveRequest = () => {
   };
 
   return (
-    <div className="p-4 lg:p-6" style={{ fontFamily: "Montserrat" }}>
+    <div className="min-h-screen bg-gradient-to-br from-emerald-200 via-emerald-100 to-emerald-50 px-1 sm:px-3 md:px-6 py-4" style={{ fontFamily: "Montserrat" }}>
+      <TooltipProvider>
       <h1 className="text-3xl lg:text-4xl font-bold mb-6" style={{ color: "#2C373B" }}>Track Leave request</h1>
 
       <div className="bg-white rounded-2xl shadow-md border p-4 lg:p-6">
@@ -174,13 +181,56 @@ const TrackLeaveRequest = () => {
                       <TableCell className="capitalize" style={{fontSize: '14px', fontWeight: 500, color: '#2C373B'}}>{req.leaveType}</TableCell>
                       <TableCell style={{fontSize: '14px', fontWeight: 500, color: '#2C373B'}}>{startFmt}</TableCell>
                       <TableCell style={{fontSize: '14px', fontWeight: 500, color: '#2C373B'}}>{endFmt}</TableCell>
-                      <TableCell style={{fontSize: '14px', fontWeight: 500, color: '#2C373B'}}>{req.reason}</TableCell>
+                      <TableCell style={{fontSize: '14px', fontWeight: 500, color: '#2C373B'}}>
+                        {req.reason ? (
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <span className="cursor-help">{truncatePreview(req.reason)}</span>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <div className="max-w-xs break-words">{req.reason}</div>
+                            </TooltipContent>
+                          </Tooltip>
+                        ) : (
+                          <span>-</span>
+                        )}
+                      </TableCell>
                       <TableCell style={{fontSize: '14px', fontWeight: 500, color: '#2C373B'}}>{req.days} days</TableCell>
                       <TableCell className={`font-medium ${statusColor}`}>{req.status}</TableCell>
-                      <TableCell className="text-gray-500">{req.remarks || "-"}</TableCell>
+                      <TableCell className="text-gray-500">
+                        {req.remarks ? (
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <span className="cursor-help">{truncatePreview(req.remarks)}</span>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <div className="max-w-xs break-words">{req.remarks}</div>
+                            </TooltipContent>
+                          </Tooltip>
+                        ) : (
+                          <span>-</span>
+                        )}
+                      </TableCell>
                       <TableCell>
-                        {req.status === "applied" ? (
-                          <button className="text-emerald-600 hover:underline">Cancel request</button>
+                        {["pending", "applied"].includes((req.status || '').toLowerCase()) ? (
+                          <Button
+                            size="sm"
+                            className="bg-red-500 hover:bg-red-600 text-white"
+                            onClick={async () => {
+                              const ok = window.confirm("Are you sure you want to cancel this request?");
+                              if (!ok) return;
+                              try {
+                                await cancelLeaveRequest(req._id);
+                                await fetchRequests(page);
+                                alert("Request cancelled successfully");
+                              } catch (err: any) {
+                                console.error("Cancel failed", err);
+                                alert(err?.response?.data?.message || "Cancel failed");
+                              }
+                            }}
+                          >
+                            Cancel
+                          </Button>
                         ) : (
                           <span className="text-gray-400">-</span>
                         )}
@@ -212,6 +262,7 @@ const TrackLeaveRequest = () => {
           </div>
         </div>
       </div>
+      </TooltipProvider>
     </div>
   );
 };
