@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ChevronLeft, ChevronRight, User } from "lucide-react";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
 const statusOptions = [
   { label: "All", value: "all" },
@@ -85,8 +86,8 @@ const TrackLeaveRequest = () => {
               {(user as any)?.profilePhotoUrl || (user as any)?.profileImage ? (
                 <AvatarImage src={(user as any)?.profilePhotoUrl || (user as any)?.profileImage} alt={`${(user as any)?.firstName || ""} ${(user as any)?.lastName || ""}`} />
               ) : (
-                <AvatarFallback>
-                  <User className="h-4 w-4 text-gray-500" />
+                <AvatarFallback className="bg-emerald-100 text-emerald-700">
+                  <User className="h-4 w-4" />
                 </AvatarFallback>
               )}
             </Avatar>
@@ -98,7 +99,7 @@ const TrackLeaveRequest = () => {
 
           <div className="flex items-center gap-4">
             <Select value={status} onValueChange={setStatus}>
-              <SelectTrigger className="w-40 rounded-lg border" style={{ color: "#2C373B" }}>
+              <SelectTrigger className="w-40 h-8 rounded-lg border border-[#9AE6B4] bg-[rgb(209,250,229)] text-[#2C373B]">
                 <SelectValue placeholder="Status" />
               </SelectTrigger>
               <SelectContent>
@@ -109,7 +110,7 @@ const TrackLeaveRequest = () => {
             </Select>
 
             <Select value={leaveType} onValueChange={setLeaveType}>
-              <SelectTrigger className="w-44 rounded-lg border" style={{ color: "#2C373B" }}>
+              <SelectTrigger className="w-44 h-8 rounded-lg border border-[#9AE6B4] bg-[rgb(209,250,229)] text-[#2C373B]">
                 <SelectValue placeholder="Leave type" />
               </SelectTrigger>
               <SelectContent>
@@ -119,34 +120,34 @@ const TrackLeaveRequest = () => {
               </SelectContent>
             </Select>
 
-            <button className="text-gray-400" onClick={() => { setStatus("all"); setLeaveType("all"); fetchRequests(1); }}>Clear filters</button>
+            <button className="text-emerald-600 font-medium hover:underline" onClick={() => { setStatus("all"); setLeaveType("all"); fetchRequests(1); }}>Clear filters</button>
           </div>
         </div>
 
         {/* Table */}
         <div className="overflow-x-auto">
-          <table className="min-w-full">
-            <thead>
-              <tr className="bg-[#2C373B] text-white text-left">
-                <th className="px-4 py-3">Leave type</th>
-                <th className="px-4 py-3">Start date</th>
-                <th className="px-4 py-3">End Date</th>
-                <th className="px-4 py-3">Reason</th>
-                <th className="px-4 py-3">Total days</th>
-                <th className="px-4 py-3">Status</th>
-                <th className="px-4 py-3">Add Remark</th>
-                <th className="px-4 py-3">Action</th>
-              </tr>
-            </thead>
-            <tbody>
+          <Table>
+            <TableHeader>
+              <TableRow className="bg-[#2C373B] hover:bg-[#2C373B]">
+                <TableHead className="text-white hover:text-white" style={{fontSize: '12px', fontWeight: 600}}>Leave type</TableHead>
+                <TableHead className="text-white hover:text-white" style={{fontSize: '12px', fontWeight: 600}}>Start date</TableHead>
+                <TableHead className="text-white hover:text-white" style={{fontSize: '12px', fontWeight: 600}}>End Date</TableHead>
+                <TableHead className="text-white hover:text-white" style={{fontSize: '12px', fontWeight: 600}}>Reason</TableHead>
+                <TableHead className="text-white hover:text-white" style={{fontSize: '12px', fontWeight: 600}}>Total days</TableHead>
+                <TableHead className="text-white hover:text-white" style={{fontSize: '12px', fontWeight: 600}}>Status</TableHead>
+                <TableHead className="text-white hover:text-white" style={{fontSize: '12px', fontWeight: 600}}>Add Remark</TableHead>
+                <TableHead className="text-white hover:text-white" style={{fontSize: '12px', fontWeight: 600}}>Action</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
               {loading ? (
-                <tr>
-                  <td colSpan={8} className="px-4 py-10 text-center">Loading...</td>
-                </tr>
+                <TableRow>
+                  <TableCell colSpan={8} className="text-center py-8 text-gray-600">Loading...</TableCell>
+                </TableRow>
               ) : requests.length === 0 ? (
-                <tr>
-                  <td colSpan={8} className="px-4 py-10 text-center" style={{ color: "#2C373B" }}>No leave requests found</td>
-                </tr>
+                <TableRow>
+                  <TableCell colSpan={8} className="text-center py-8" style={{ color: "#2C373B" }}>No leave requests found</TableCell>
+                </TableRow>
               ) : (
                 requests.map((req) => {
                   const start = new Date(req.startDate);
@@ -156,29 +157,27 @@ const TrackLeaveRequest = () => {
                   const statusColor = req.status === "approved" ? "text-emerald-600" : req.status === "rejected" ? "text-red-600" : "text-yellow-600";
                   const rowBg = req.status === "approved" ? "bg-emerald-50" : req.status === "rejected" ? "bg-rose-50" : "bg-amber-50";
                   return (
-                    <tr key={req._id} className={`border-b ${rowBg}`}>
-                      <td className="px-4 py-3 capitalize">{req.leaveType}</td>
-                      <td className="px-4 py-3">{startFmt}</td>
-                      <td className="px-4 py-3">{endFmt}</td>
-                      <td className="px-4 py-3" style={{ color: "#2C373B" }}>{req.reason}</td>
-                      <td className="px-4 py-3">{req.days} days</td>
-                      <td className={`px-4 py-3 font-medium ${statusColor}`}>
-                        {req.status === "applied" ? "Pending" : req.status === "rejected" ? "Declined" : req.status === "approved" ? "Approved" : req.status}
-                      </td>
-                      <td className="px-4 py-3 text-gray-500">{req.remarks || "-"}</td>
-                      <td className="px-4 py-3">
+                    <TableRow key={req._id} className={`${rowBg}`}>
+                      <TableCell className="capitalize" style={{fontSize: '14px', fontWeight: 500, color: '#2C373B'}}>{req.leaveType}</TableCell>
+                      <TableCell style={{fontSize: '14px', fontWeight: 500, color: '#2C373B'}}>{startFmt}</TableCell>
+                      <TableCell style={{fontSize: '14px', fontWeight: 500, color: '#2C373B'}}>{endFmt}</TableCell>
+                      <TableCell style={{fontSize: '14px', fontWeight: 500, color: '#2C373B'}}>{req.reason}</TableCell>
+                      <TableCell style={{fontSize: '14px', fontWeight: 500, color: '#2C373B'}}>{req.days} days</TableCell>
+                      <TableCell className={`font-medium ${statusColor}`}>{req.status === "applied" ? "Pending" : req.status === "rejected" ? "Declined" : req.status === "approved" ? "Approved" : req.status}</TableCell>
+                      <TableCell className="text-gray-500">{req.remarks || "-"}</TableCell>
+                      <TableCell>
                         {req.status === "applied" ? (
                           <button className="text-emerald-600 hover:underline">Cancel request</button>
                         ) : (
                           <span className="text-gray-400">-</span>
                         )}
-                      </td>
-                    </tr>
+                      </TableCell>
+                    </TableRow>
                   );
                 })
               )}
-            </tbody>
-          </table>
+            </TableBody>
+          </Table>
         </div>
 
         {/* Pagination */}
