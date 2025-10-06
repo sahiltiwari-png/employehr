@@ -390,22 +390,22 @@ const LeavePolicy = () => {
     );
   }
 
+  const activePolicy = policies.find((p) => p.isActive) || policies[0];
+  const formatDate = (dateStr?: string) => {
+    if (!dateStr) return "-";
+    const d = new Date(dateStr);
+    if (isNaN(d.getTime())) return "-";
+    return d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+  };
+  const now = new Date();
+  const monthStartLabel = new Date(now.getFullYear(), now.getMonth(), 1).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+  const monthEndLabel = new Date(now.getFullYear(), now.getMonth() + 1, 0).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-emerald-200 via-emerald-100 to-emerald-50 px-2 sm:px-4 md:px-6 py-6">
       <div className="w-full space-y-6">
         <div className="flex flex-col md:flex-row justify-between md:items-center gap-4">
-          <h1 className="text-2xl font-bold" style={{color: '#2C373B'}}>Leave Policy creation</h1>
-          {!isFormMode && (
-            <Button
-              onClick={() => setIsModalOpen(true)}
-              className="hover:opacity-90"
-              style={{ backgroundColor: '#4CDC9C', color: '#2C373B' }}
-              disabled={addingLeaveType}
-            >
-              <Plus className="w-4 h-4 mr-2" />
-              {addingLeaveType ? "Adding..." : "Add Leave Type"}
-            </Button>
-          )}
+          <h1 className="text-xl font-semibold tracking-wide" style={{color: '#2C373B'}}>Review the policy information and manage leave types</h1>
         </div>
 
         {isFormMode ? (
@@ -550,6 +550,19 @@ const LeavePolicy = () => {
               <CardTitle>Existing Leave Policies</CardTitle>
             </CardHeader>
             <CardContent>
+              {/* Banner above table */}
+              <div className="mb-4">
+                <div className="bg-[#2C373B] text-white rounded-2xl px-4 py-4 md:px-6 md:py-5 flex items-start justify-between">
+                  <div className="space-y-1">
+                    <div className="text-sm md:text-base font-medium">Leave Policy details</div>
+                    <div className="space-y-0.5">
+                      <div className="text-xs md:text-sm font-medium text-white/90">Annual Leave Policy</div>
+                      <div className="text-xs md:text-sm text-gray-300">{monthStartLabel} - {monthEndLabel}</div>
+                    </div>
+                  </div>
+                  <div className="text-emerald-400 font-semibold">Active</div>
+                </div>
+              </div>
               <div className="overflow-x-auto">
                 <Table>
                   <TableHeader>
