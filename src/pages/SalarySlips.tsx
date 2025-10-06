@@ -117,9 +117,7 @@ const SalarySlip = () => {
   const totalDeductions = Number(myDetail?.pf ?? 0) + Number(myDetail?.esi ?? 0) + Number(myDetail?.tds ?? 0) + Number(myDetail?.professionalTax ?? 0) + Number(myDetail?.otherDeductions ?? 0);
   const netPay = Math.max(0, monthlyGross - totalDeductions);
 
-  const handleDownload = () => {
-    window.print();
-  };
+  // Removed download action per request.
 
   const openView = async (record: SalaryStructure) => {
     try {
@@ -332,13 +330,7 @@ const SalarySlip = () => {
           <div>
             <h1 className="text-2xl font-semibold" style={{color: '#2C373B'}}>Salary Structure</h1>
           </div>
-          <Button
-            className="hover:opacity-80"
-            style={{backgroundColor: '#4CDC9C', color: '#2C373B'}}
-            onClick={handleDownload}
-          >
-            Download Salary Structure
-          </Button>
+          {/* Download button removed */}
         </div>
         <div className="h-4" />
 
