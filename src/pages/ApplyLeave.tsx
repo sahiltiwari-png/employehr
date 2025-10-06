@@ -146,12 +146,15 @@ const ApplyLeave = () => {
     }
   };
 
-  // Auto-close success modal after short delay
+  // Auto-close success modal and redirect to Track Leave after short delay
   useEffect(() => {
     if (!successOpen) return;
-    const t = setTimeout(() => setSuccessOpen(false), 2500);
+    const t = setTimeout(() => {
+      setSuccessOpen(false);
+      navigate('/leaves/track');
+    }, 2000);
     return () => clearTimeout(t);
-  }, [successOpen]);
+  }, [successOpen, navigate]);
 
   const fetchRequests = async (page: number = 1) => {
     try {
@@ -429,7 +432,7 @@ const ApplyLeave = () => {
             <div className="text-xl font-semibold">Leave Request Submitted</div>
             <div className="text-sm text-muted-foreground text-center">You can track or cancel the request before approval.</div>
             <div className="flex gap-3 mt-2">
-              <Button variant="outline" onClick={() => { setSuccessOpen(false); navigate('/leaves/requests'); }}>Track Leave Status</Button>
+              <Button variant="outline" onClick={() => { setSuccessOpen(false); navigate('/leaves/track'); }}>Track Leave Status</Button>
               <Button className="bg-[#4CDC9C] text-[#2C373B] hover:bg-[#3fd18e]" onClick={() => { setSuccessOpen(false); navigate('/dashboard'); }}>Go to Dashboard</Button>
             </div>
           </div>

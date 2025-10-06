@@ -51,10 +51,8 @@ const navigation: NavigationItem[] = [
   { title: "Leaves", url: "/leaves", icon: Calendar, hasSubmenu: true, submenu: [
     { title: "Leave Policy", url: "/leaves/policy" },
     { title: "Leave Balance", url: "/leaves/balance" },
-    { title: "Leave Allotment", url: "/leaves/allotment" },
-    { title: "Leave Requests", url: "/leaves/requests" },
-    { title: "Track Leave request", url: "/leaves/track" },
-    { title: "Apply Leave", url: "/apply-leave" }
+    { title: "Apply Leave", url: "/apply-leave" },
+    { title: "Track Leave request", url: "/leaves/track" }
   ] },
   { title: "Reports", url: "/reports", icon: FileText, hasSubmenu: true, submenu: [
     { title: "Employees Report", url: "/reports/employees" },
