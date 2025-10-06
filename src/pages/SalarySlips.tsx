@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Eye, Edit, Trash2, User, X, IndianRupee, Calculator, Wallet } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -13,31 +14,20 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
-  getSalaryStructures,
   getSalaryStructureByEmployee,
   updateSalaryStructure,
   deleteSalaryStructure,
   type SalaryStructure,
-  type SalaryStructuresResponse,
   createSalaryStructure,
 } from "@/api/salaryStructures";
 import { getEmployees } from "@/api/employees";
 import { toast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
 
-interface SalaryResponseShape {
-  page: number;
-  limit: number;
-  total: number;
-  totalPages: number;
-  items: SalaryStructure[];
-}
+// Removed list response shape; this page only fetches by employeeId.
 
 const SalarySlip = () => {
-  const [salaryData, setSalaryData] = useState<SalaryResponseShape | null>(null);
-  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [currentPage, setCurrentPage] = useState(1);
 
   // Modal states
   const [viewOpen, setViewOpen] = useState(false);
@@ -91,42 +81,20 @@ const SalarySlip = () => {
 
   // Logged-in employee salary structure card states
   const { user } = useAuth();
+  const [searchParams] = useSearchParams();
   const [myDetail, setMyDetail] = useState<SalaryStructure | null>(null);
   const [myLoading, setMyLoading] = useState<boolean>(true);
   const [myError, setMyError] = useState<string | null>(null);
 
-  useEffect(() => {
-    const fetchSalaryData = async () => {
-      setLoading(true);
-      try {
-        const params: any = { page: currentPage, limit: 10 };
-        const res: SalaryStructuresResponse = await getSalaryStructures(params);
-        const shape: SalaryResponseShape = {
-          page: res.page,
-          limit: res.limit,
-          total: res.total,
-          totalPages: res.totalPages,
-          items: res.data,
-        };
-        setSalaryData(shape);
-        setError(null);
-      } catch (err) {
-        setError("Failed to load salary structures");
-        setSalaryData(null);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchSalaryData();
-  }, [currentPage]);
+  // Removed list fetching; we only load current user's salary structure below.
 
   // Load current user's salary structure for the card view
   useEffect(() => {
     const loadMyStructure = async () => {
       try {
         setMyLoading(true);
-        const id = (user as any)?._id ?? (user as any)?.id;
+        const paramEmployeeId = searchParams.get("employeeId");
+        const id = paramEmployeeId ?? ((user as any)?._id ?? (user as any)?.id);
         if (!id) {
           setMyError("User ID not found");
           setMyLoading(false);
@@ -142,7 +110,7 @@ const SalarySlip = () => {
       }
     };
     loadMyStructure();
-  }, [user]);
+  }, [user, searchParams]);
 
   const formatINR = (v: number | undefined) => `₹${Number(v ?? 0).toLocaleString()}`;
   const monthlyGross = Number(myDetail?.gross ?? 0);
@@ -269,9 +237,6 @@ const SalarySlip = () => {
 
       await updateSalaryStructure(selectedRecord._id, payload);
       setEditOpen(false);
-      // refresh list
-      const res: SalaryStructuresResponse = await getSalaryStructures({ page: currentPage, limit: 10 });
-      setSalaryData({ page: res.page, limit: res.limit, total: res.total, totalPages: res.totalPages, items: res.data });
     } catch (e) {
       setError("Failed to update salary structure");
       toast({
@@ -288,9 +253,6 @@ const SalarySlip = () => {
     try {
       await deleteSalaryStructure(selectedRecord._id);
       setDeleteOpen(false);
-      // refresh list after delete
-      const res: SalaryStructuresResponse = await getSalaryStructures({ page: currentPage, limit: 10 });
-      setSalaryData({ page: res.page, limit: res.limit, total: res.total, totalPages: res.totalPages, items: res.data });
     } catch (e) {
       setError("Failed to delete salary structure");
       toast({
@@ -349,9 +311,7 @@ const SalarySlip = () => {
         otherDeductions: "",
       });
       setEmployeeSearch("");
-      // refresh list
-      const res: SalaryStructuresResponse = await getSalaryStructures({ page: currentPage, limit: 10 });
-      setSalaryData({ page: res.page, limit: res.limit, total: res.total, totalPages: res.totalPages, items: res.data });
+      // No list refresh; this page is employee-specific.
       setError(null);
     } catch (e) {
       setError("Failed to create salary structure");
@@ -408,27 +368,51 @@ const SalarySlip = () => {
               </div>
 
               {/* Metrics row */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
-                <div className="bg-[#2C373B] text-white rounded-lg px-4 py-3 flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <IndianRupee className="h-5 w-5 text-emerald-300" />
-                    <span className="text-sm">CTC(Annual)</span>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 mb-6">
+                {/* CTC Card */}
+                <div className="bg-[#2C373B] text-white rounded-2xl px-5 py-4 flex items-center justify-between">
+                  <div className="flex items-center gap-4">
+                    {/* Green circular badge with inner circle and gold icon */}
+                    <div className="relative flex items-center justify-center h-9 w-9 rounded-full bg-emerald-500/90">
+                      <div className="h-7 w-7 rounded-full bg-[#1F2A31] flex items-center justify-center">
+                        <IndianRupee className="h-4 w-4 text-yellow-400" />
+                      </div>
+                    </div>
+                    <span className="text-base font-medium leading-tight">CTC(Annual)</span>
                   </div>
-                  <span className="font-medium" style={{fontSize: '14px', fontWeight: '500'}}>{formatINR(myDetail.ctc)}</span>
+                  <span className="text-base font-semibold tracking-wide">{formatINR(myDetail.ctc)}</span>
                 </div>
-                <div className="bg-[#2C373B] text-white rounded-lg px-4 py-3 flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <Calculator className="h-5 w-5 text-emerald-300" />
-                    <span className="text-sm">Gross Monthly Salary</span>
+
+                {/* Gross Monthly Salary Card */}
+                <div className="bg-[#2C373B] text-white rounded-2xl px-5 py-4 flex items-center justify-between">
+                  <div className="flex items-center gap-4">
+                    <div className="relative flex items-center justify-center h-9 w-9 rounded-full bg-emerald-500/90">
+                      <div className="h-7 w-7 rounded-full bg-[#1F2A31] flex items-center justify-center">
+                        <Calculator className="h-4 w-4 text-yellow-400" />
+                      </div>
+                    </div>
+                    <div className="leading-tight">
+                      <div className="text-base font-medium">Gross Monthly</div>
+                      <div className="text-base font-medium">Salary</div>
+                    </div>
                   </div>
-                  <span className="font-medium" style={{fontSize: '14px', fontWeight: '500'}}>{formatINR(myDetail.gross)}</span>
+                  <span className="text-base font-semibold tracking-wide">{formatINR(myDetail.gross)}</span>
                 </div>
-                <div className="bg-[#2C373B] text-white rounded-lg px-4 py-3 flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <Wallet className="h-5 w-5 text-emerald-300" />
-                    <span className="text-sm">Net Pay <span className="opacity-80">(In Hand)</span></span>
+
+                {/* Net Pay Card */}
+                <div className="bg-[#2C373B] text-white rounded-2xl px-5 py-4 flex items-center justify-between">
+                  <div className="flex items-center gap-4">
+                    <div className="relative flex items-center justify-center h-9 w-9 rounded-full bg-emerald-500/90">
+                      <div className="h-7 w-7 rounded-full bg-[#1F2A31] flex items-center justify-center">
+                        <Wallet className="h-4 w-4 text-yellow-400" />
+                      </div>
+                    </div>
+                    <div className="leading-tight">
+                      <div className="text-base font-medium">Net Pay</div>
+                      <div className="text-sm opacity-80">(In Hand)</div>
+                    </div>
                   </div>
-                  <span className="font-medium" style={{fontSize: '14px', fontWeight: '500'}}>{formatINR(netPay)}</span>
+                  <span className="text-base font-semibold tracking-wide">{formatINR(netPay)}</span>
                 </div>
               </div>
 
