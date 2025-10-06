@@ -246,10 +246,10 @@ const TrackLeaveRequest = () => {
                           <span>-</span>
                         )}
                       </TableCell>
-                      <TableCell>
+                      <TableCell className="whitespace-nowrap">
                         {["pending", "applied"].includes((req.status || '').toLowerCase()) ? (
                           <button
-                            className="text-blue-600 hover:underline"
+                            className="text-blue-600 hover:underline whitespace-nowrap"
                             onClick={() => {
                               setCancelId(req._id);
                               setConfirmOpen(true);
