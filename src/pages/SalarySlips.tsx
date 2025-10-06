@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Eye, Edit, Trash2, User, X } from "lucide-react";
+import { Eye, Edit, Trash2, User, X, IndianRupee, Calculator, Wallet } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   Dialog,
@@ -23,6 +23,7 @@ import {
 } from "@/api/salaryStructures";
 import { getEmployees } from "@/api/employees";
 import { toast } from "@/hooks/use-toast";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface SalaryResponseShape {
   page: number;
@@ -88,6 +89,12 @@ const SalarySlip = () => {
   const [employeeLoading, setEmployeeLoading] = useState(false);
   const [employeeDropdownOpen, setEmployeeDropdownOpen] = useState(false);
 
+  // Logged-in employee salary structure card states
+  const { user } = useAuth();
+  const [myDetail, setMyDetail] = useState<SalaryStructure | null>(null);
+  const [myLoading, setMyLoading] = useState<boolean>(true);
+  const [myError, setMyError] = useState<string | null>(null);
+
   useEffect(() => {
     const fetchSalaryData = async () => {
       setLoading(true);
@@ -113,6 +120,38 @@ const SalarySlip = () => {
 
     fetchSalaryData();
   }, [currentPage]);
+
+  // Load current user's salary structure for the card view
+  useEffect(() => {
+    const loadMyStructure = async () => {
+      try {
+        setMyLoading(true);
+        const id = (user as any)?._id ?? (user as any)?.id;
+        if (!id) {
+          setMyError("User ID not found");
+          setMyLoading(false);
+          return;
+        }
+        const res = await getSalaryStructureByEmployee(id);
+        setMyDetail(res.data);
+        setMyError(null);
+      } catch (e: any) {
+        setMyError(e?.response?.data?.message || "Failed to fetch salary structure");
+      } finally {
+        setMyLoading(false);
+      }
+    };
+    loadMyStructure();
+  }, [user]);
+
+  const formatINR = (v: number | undefined) => `₹${Number(v ?? 0).toLocaleString()}`;
+  const monthlyGross = Number(myDetail?.gross ?? 0);
+  const totalDeductions = Number(myDetail?.pf ?? 0) + Number(myDetail?.esi ?? 0) + Number(myDetail?.tds ?? 0) + Number(myDetail?.professionalTax ?? 0) + Number(myDetail?.otherDeductions ?? 0);
+  const netPay = Math.max(0, monthlyGross - totalDeductions);
+
+  const handleDownload = () => {
+    window.print();
+  };
 
   const openView = async (record: SalaryStructure) => {
     try {
@@ -332,111 +371,92 @@ const SalarySlip = () => {
         <div className="flex items-start justify-between mb-1">
           <div>
             <h1 className="text-2xl font-semibold" style={{color: '#2C373B'}}>Salary Structure</h1>
-            <p className="text-sm" style={{color: '#2C373B'}}>
-              Overview of employee salary structures with detailed breakdown
-            </p>
           </div>
           <Button
             className="hover:opacity-80"
             style={{backgroundColor: '#4CDC9C', color: '#2C373B'}}
-            onClick={openCreate}
+            onClick={handleDownload}
           >
-            Create Salary Structure
+            Download Salary Structure
           </Button>
         </div>
         <div className="h-4" />
 
-        {/* Table */}
-        <div className="bg-white rounded-lg shadow-sm overflow-hidden">
-          {loading ? (
+        {/* Salary Card */}
+        <div className="bg-white rounded-xl shadow-md border p-6">
+          {myLoading ? (
             <div className="flex justify-center items-center p-8">
-              <p>Loading salary slip data...</p>
+              <p className="text-sm" style={{color: '#2C373B'}}>Loading...</p>
+            </div>
+          ) : myError ? (
+            <div className="p-4 text-sm text-red-600">{myError}</div>
+          ) : myDetail ? (
+            <div>
+              {/* Employee details */}
+              <div className="mb-4 space-y-1">
+                <p className="text-sm" style={{color: '#2C373B'}}>
+                  <span className="font-medium">Employee:</span> {myDetail.employeeId?.firstName} {myDetail.employeeId?.lastName}
+                </p>
+                {myDetail.employeeId?.designation ? (
+                  <p className="text-sm" style={{color: '#2C373B'}}>
+                    <span className="font-medium">Designation:</span> {myDetail.employeeId.designation}
+                  </p>
+                ) : null}
+                <p className="text-sm" style={{color: '#2C373B'}}>
+                  <span className="font-medium">Employee ID:</span> {myDetail.employeeId?.employeeCode}
+                </p>
+              </div>
+
+              {/* Metrics row */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+                <div className="bg-[#2C373B] text-white rounded-lg px-4 py-3 flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <IndianRupee className="h-5 w-5 text-emerald-300" />
+                    <span className="text-sm">CTC(Annual)</span>
+                  </div>
+                  <span className="font-medium" style={{fontSize: '14px', fontWeight: '500'}}>{formatINR(myDetail.ctc)}</span>
+                </div>
+                <div className="bg-[#2C373B] text-white rounded-lg px-4 py-3 flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Calculator className="h-5 w-5 text-emerald-300" />
+                    <span className="text-sm">Gross Monthly Salary</span>
+                  </div>
+                  <span className="font-medium" style={{fontSize: '14px', fontWeight: '500'}}>{formatINR(myDetail.gross)}</span>
+                </div>
+                <div className="bg-[#2C373B] text-white rounded-lg px-4 py-3 flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Wallet className="h-5 w-5 text-emerald-300" />
+                    <span className="text-sm">Net Pay <span className="opacity-80">(In Hand)</span></span>
+                  </div>
+                  <span className="font-medium" style={{fontSize: '14px', fontWeight: '500'}}>{formatINR(netPay)}</span>
+                </div>
+              </div>
+
+              {/* Breakdown */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div>
+                  <h3 className="text-lg font-semibold mb-2" style={{color: '#2C373B'}}>Earnings</h3>
+                  <div className="space-y-2 text-sm" style={{color: '#2C373B'}}>
+                    <p>Basic | {formatINR(myDetail.basic)}</p>
+                    <p>HRA | {formatINR(myDetail.hra)}</p>
+                    <p>Conveyance | {formatINR(myDetail.conveyance)}</p>
+                    <p>Special Allowance | {formatINR(myDetail.specialAllowance)}</p>
+                  </div>
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold mb-2" style={{color: '#2C373B'}}>Deductions</h3>
+                  <div className="space-y-2 text-sm" style={{color: '#2C373B'}}>
+                    <p>PF | {formatINR(myDetail.pf)}</p>
+                    <p>TDS | {formatINR(myDetail.tds)}</p>
+                    <p>Professional Tax | {formatINR(myDetail.professionalTax)}</p>
+                    <p>ESI | {formatINR(myDetail.esi)}</p>
+                    <p>Other | {formatINR(myDetail.otherDeductions)}</p>
+                  </div>
+                </div>
+              </div>
             </div>
           ) : (
-            <div className="overflow-x-hidden w-full">
-              <table className="min-w-full w-full text-sm">
-                <thead className="bg-gray-50 border-b">
-                  <tr>
-                    <th className="px-4 py-2 text-left font-semibold" style={{fontSize: '12px', fontWeight: '600', color: '#2C373B'}}>Employee</th>
-                    <th className="px-4 py-2 text-left font-semibold" style={{fontSize: '12px', fontWeight: '600', color: '#2C373B'}}>Code</th>
-                    <th className="px-4 py-2 text-left font-semibold" style={{fontSize: '12px', fontWeight: '600', color: '#2C373B'}}>CTC</th>
-                    <th className="px-4 py-2 text-left font-semibold" style={{fontSize: '12px', fontWeight: '600', color: '#2C373B'}}>HRA</th>
-                    <th className="px-4 py-2 text-left font-semibold" style={{fontSize: '12px', fontWeight: '600', color: '#2C373B'}}>Conveyance</th>
-                    <th className="px-4 py-2 text-left font-semibold" style={{fontSize: '12px', fontWeight: '600', color: '#2C373B'}}>Special Allowance</th>
-                    <th className="px-4 py-2 text-left font-semibold" style={{fontSize: '12px', fontWeight: '600', color: '#2C373B'}}>Gross</th>
-                    <th className="px-4 py-2 text-left font-semibold" style={{fontSize: '12px', fontWeight: '600', color: '#2C373B'}}>Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {salaryData && salaryData.items.length > 0 ? (
-                    salaryData.items.map((record) => (
-                      <tr
-                        key={record._id}
-                        className="border-b last:border-0 hover:bg-emerald-50 transition-colors"
-                      >
-                        <td className="px-4 py-2">
-                          <div className="flex items-center gap-3">
-                            <Avatar className="h-10 w-10">
-                              {record.employeeId?.profilePhotoUrl ? (
-                                <AvatarImage
-                                  src={record.employeeId.profilePhotoUrl}
-                                  alt={`${record.employeeId?.firstName ?? ""} ${record.employeeId?.lastName ?? ""}`}
-                                />
-                              ) : null}
-                              <AvatarFallback>
-                                <User className="h-5 w-5" style={{color: '#2C373B'}} />
-                              </AvatarFallback>
-                            </Avatar>
-                            <div>
-                              <div className="font-medium" style={{fontSize: '14px', fontWeight: '500', color: '#2C373B'}}>{record.employeeId?.firstName ?? ""} {record.employeeId?.lastName ?? ""}</div>
-                            </div>
-                          </div>
-                        </td>
-                        <td className="px-4 py-2" style={{fontSize: '14px', fontWeight: '500', color: '#2C373B'}}>{record.employeeId?.employeeCode ?? ""}</td>
-                        <td className="px-4 py-2" style={{fontSize: '14px', fontWeight: '500', color: '#2C373B'}}>₹{Number(record.ctc ?? 0).toLocaleString()}</td>
-                        <td className="px-4 py-2" style={{fontSize: '14px', fontWeight: '500', color: '#2C373B'}}>₹{Number(record.hra ?? 0).toLocaleString()}</td>
-                        <td className="px-4 py-2" style={{fontSize: '14px', fontWeight: '500', color: '#2C373B'}}>₹{Number(record.conveyance ?? 0).toLocaleString()}</td>
-                        <td className="px-4 py-2" style={{fontSize: '14px', fontWeight: '500', color: '#2C373B'}}>₹{Number(record.specialAllowance ?? 0).toLocaleString()}</td>
-                        <td className="px-4 py-2" style={{fontSize: '14px', fontWeight: '500', color: '#2C373B'}}>₹{Number(record.gross ?? 0).toLocaleString()}</td>
-                        <td className="px-4 py-2 flex gap-2">
-                          <Button
-                            variant="link"
-                            size="icon"
-                            className="h-8 w-8 p-0 hover:opacity-80 focus:outline-none focus:ring-0 focus:border-0"
-                            style={{backgroundColor: '#4CDC9C', color: '#2C373B'}}
-                            onClick={() => openView(record)}
-                          >
-                            <Eye className="w-5 h-5" />
-                          </Button>
-                          <Button
-                            variant="link"
-                            size="icon"
-                            className="h-8 w-8 p-0 hover:opacity-80 focus:outline-none focus:ring-0 focus:border-0"
-                            style={{backgroundColor: '#4CDC9C', color: '#2C373B'}}
-                            onClick={() => openEdit(record)}
-                          >
-                            <Edit className="w-5 h-5" />
-                          </Button>
-                          <Button
-                            variant="link"
-                            size="icon"
-                            className="h-8 w-8 p-0 hover:opacity-80 focus:outline-none focus:ring-0 focus:border-0"
-                            style={{backgroundColor: '#4CDC9C', color: '#2C373B'}}
-                            onClick={() => openDelete(record)}
-                          >
-                            <Trash2 className="w-5 h-5" />
-                          </Button>
-                        </td>
-                      </tr>
-                    ))
-                  ) : (
-                    <tr>
-                      <td colSpan={8} className="px-4 py-6 text-center text-gray-600">No data found</td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
-            </div>
+            <div className="p-4 text-sm" style={{color: '#2C373B'}}>No data found</div>
           )}
         </div>
       </div>
