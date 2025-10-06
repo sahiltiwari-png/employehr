@@ -43,17 +43,16 @@ import { useAuth } from '@/contexts/AuthContext';
 
 const navigation: NavigationItem[] = [
   { title: "Dashboard", url: "/dashboard", icon: Home },
-  { title: "Employees", url: "/employees", icon: Users },
-  { title: "Regularization", url: "/regularization", icon: CheckCircle },
-  { title: "Payroll", url: "/payroll", icon: FileText },
-  { title: "Salary Structure", url: "/salary-slips", icon: FileText },
   { title: "Attendance", url: "/attendance", icon: Clock },
+  { title: "Regularization", url: "/regularization", icon: CheckCircle },
   { title: "Leaves", url: "/leaves", icon: Calendar, hasSubmenu: true, submenu: [
     { title: "Leave Policy", url: "/leaves/policy" },
     { title: "Leave Balance", url: "/leaves/balance" },
     { title: "Apply Leave", url: "/apply-leave" },
     { title: "Track Leave request", url: "/leaves/track" }
   ] },
+  { title: "Salary Structure", url: "/salary-slips", icon: FileText },
+  { title: "Payroll", url: "/payroll", icon: FileText },
   { title: "Reports", url: "/reports", icon: FileText, hasSubmenu: true, submenu: [
     { title: "Employees Report", url: "/reports/employees" },
     { title: "Leave Requests Report", url: "/reports/leave-requests" },
