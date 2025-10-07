@@ -21,7 +21,7 @@ import LeaveBalance from "./pages/LeaveBalance";
 import ApplyLeave from "./pages/ApplyLeave";
 import Employees from "./pages/Employees";
 import Profile from "./pages/Profile";
-import Settings from "./pages/Settings";
+import Settings from "./pages/ProfilePage";
 import AdminPanel from "./pages/AdminPanel";
 import NotFound from "./pages/NotFound";
 import AddEmployeeStepper from "./pages/AddEmployeeStepper";

@@ -1,12 +1,12 @@
 import { ReactNode, useState, createContext, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { Input } from "@/components/ui/input";
 // Context to provide search value and setter
 export const OrgSearchContext = createContext<{search: string, setSearch: (v: string) => void}>({search: '', setSearch: () => {}});
 import { useAuth } from '@/contexts/AuthContext';
 import { AppSidebar } from "@/components/layout/AppSidebar";
 import { SidebarTrigger } from "@/components/ui/sidebar";
-import { Bell, User } from "lucide-react";
+import { Bell, User, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -26,6 +26,7 @@ const MainLayout = ({ children }: MainLayoutProps) => {
   const [search, setSearch] = useState("");
   const [avatarUrl, setAvatarUrl] = useState<string | undefined>(undefined);
   const navigate = useNavigate();
+  const location = useLocation();
   const handleLogout = () => {
     localStorage.clear();
     logout();
@@ -52,28 +53,40 @@ const MainLayout = ({ children }: MainLayoutProps) => {
         (user?.name || `${user?.firstName || ''} ${user?.lastName || ''}`).trim()
       )}&background=E8F5E9&color=2C373B&size=64`
     : undefined;
+  const isSettingsPage = location.pathname === '/settings';
+
   return (
     <div className="min-h-screen flex w-full bg-muted/20">
       <AppSidebar />
       
       <div className="flex-1 flex flex-col">
         {/* Header */}
-        <header className="sticky top-0 z-40 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+        <header className={`sticky top-0 z-40 border-b ${isSettingsPage ? 'bg-[#4CDC9C]' : 'bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60'}`}>
           <div className="container flex h-14 items-center justify-between px-4">
             <div className="flex items-center gap-4 w-full">
               <SidebarTrigger />
-              {user?.role === 'superAdmin' ? (
+              {user?.role === 'superAdmin' && !isSettingsPage ? (
                 <Input
                   type="text"
                   placeholder="Search organizations..."
-                  className="w-full max-w-2xl bg-background shadow-sm border-0 focus:border-0 focus-visible:border-0 focus:ring-0 focus-visible:ring-0 outline-none"
+                  className="w-full max-w-3xl bg-background shadow-sm border-0 focus:border-0 focus-visible:border-0 focus:ring-0 focus-visible:ring-0 outline-none"
                   value={search}
                   onChange={e => setSearch(e.target.value)}
                 />
               ) : null}
+               {isSettingsPage && (
+                <div className="relative w-full">
+                  <Input
+                    type="search"
+                    placeholder="Search organization"
+                    className="w-full pr-10 pl-4 bg-white rounded-full"
+                  />
+                  <Search className="absolute right-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-500" />
+                </div>
+              )}
             </div>
 
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-4 pl-4">
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" className="relative h-8 w-8 rounded-full">
