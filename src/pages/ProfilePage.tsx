@@ -3,6 +3,7 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
@@ -68,6 +69,7 @@ const ProfilePage = () => {
   const [initialForm, setInitialForm] = useState(form);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [selectedDocType, setSelectedDocType] = useState<string>('aadhaar');
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -254,7 +256,7 @@ const ProfilePage = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-emerald-200 via-emerald-100 to-emerald-50 p-4 sm:p-8">
-      <h1 className="text-2xl font-bold mb-4 text-gray-800">Profile</h1>
+      <h1 className="text-xl font-semibold mb-3 text-gray-800">Profile</h1>
       <Card className="w-full max-w-4xl mx-auto">
         <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle>Profile</CardTitle>
@@ -266,12 +268,30 @@ const ProfilePage = () => {
 </div>
 
         </CardHeader>
-        <CardContent>
+        <CardContent className="text-sm">
           {error && <p className="text-red-500">{error}</p>}
           {success && <p className="text-green-500">{success}</p>}
+          {/* Profile Picture moved to top for mobile-first layout */}
+          <div className="mt-2 p-3 border rounded-lg bg-gray-50">
+            <Label className="text-[13px] text-gray-700">Profile Picture</Label>
+            <div className="flex flex-col sm:flex-row items-center gap-3 mt-2">
+              <div className="w-16 h-16 sm:w-24 sm:h-24 bg-gray-200 rounded-full sm:rounded flex items-center justify-center overflow-hidden">
+                {form.profileImage ? (
+                  <img src={form.profileImage} alt="Profile" className="w-full h-full object-cover rounded-full sm:rounded" />
+                ) : (
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 text-gray-400" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-4 2 2 4-4 2 2z" clipRule="evenodd" /></svg>
+                )}
+              </div>
+              <div className="text-center sm:text-left">
+                <Input id="profileImage" type="file" onChange={handleImageChange} className="hidden" />
+                <Button asChild variant="outline"><Label htmlFor="profileImage" className="cursor-pointer">Choose File</Label></Button>
+                <p className="text-sm text-gray-500 mt-1">Please upload square image, size less than 100KB</p>
+              </div>
+            </div>
+          </div>
           {/* Employee Details */}
-          <h2 className="text-xl font-semibold mb-4">Employee Details</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <h2 className="text-lg font-semibold mt-6 mb-3">Employee Details</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div><Label htmlFor="firstName">First Name</Label><Input id="firstName" name="firstName" value={form.firstName} onChange={handleChange} placeholder="Aditya" /></div>
             <div><Label htmlFor="lastName">Last Name</Label><Input id="lastName" name="lastName" value={form.lastName} onChange={handleChange} placeholder="Yadav" /></div>
             <div><Label htmlFor="email">Email</Label><Input id="email" name="email" type="email" value={form.email} onChange={handleChange} placeholder="Company name" disabled/></div>
@@ -284,23 +304,7 @@ const ProfilePage = () => {
             <div><Label htmlFor="dateOfJoining">Date Of Joining</Label><Input id="dateOfJoining" name="dateOfJoining" type="date" value={form.dateOfJoining} onChange={handleChange} disabled /></div>
             <div><Label htmlFor="probationEndDate">Probation End Date</Label><Input id="probationEndDate" name="probationEndDate" type="date" value={form.probationEndDate} onChange={handleChange} disabled /></div>
           </div>
-          <div className="mt-6">
-            <Label>Profile Picture</Label>
-            <div className="flex items-center gap-4 mt-2 p-4 border rounded-lg bg-gray-50">
-              <div className="w-24 h-24 bg-gray-200 rounded flex items-center justify-center">
-                {form.profileImage ? (
-                  <img src={form.profileImage} alt="Profile" className="w-full h-full object-cover rounded" />
-                ) : (
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 text-gray-400" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-4 2 2 4-4 2 2z" clipRule="evenodd" /></svg>
-                )}
-              </div>
-              <div>
-                <Input id="profileImage" type="file" onChange={handleImageChange} className="hidden" />
-                <Button asChild variant="outline"><Label htmlFor="profileImage" className="cursor-pointer">Choose File</Label></Button>
-                <p className="text-sm text-gray-500 mt-1">Please upload square image, size less than 100KB</p>
-              </div>
-            </div>
-          </div>
+          
 
           {/* Personal Details */}
           <h2 className="text-xl font-semibold mt-8 mb-4">Personal Details</h2>
@@ -332,37 +336,55 @@ const ProfilePage = () => {
             </div>
           </div>
 
-          {/* Documents */}
+          {/* Documents - Horizontal row with dropdown upload */}
           <h2 className="text-xl font-semibold mt-8 mb-4">Documents</h2>
-          <div className="space-y-6">
-            {['aadhaar','pan','passport','driving-license','voter-id','other'].map((docType) => {
-              const doc = (form.documents || []).find((d: any) => d.type === docType);
-              const url = doc?.url || '';
-              const isImage = url && /(\.png|\.jpg|\.jpeg|\.gif|\.webp)$/i.test(url);
-              return (
-                <div key={docType} className="p-4 border rounded-lg bg-gray-50">
-                  <div className="flex items-center justify-between">
-                    <Label htmlFor={`doc-${docType}`}>{docType.replace('-', ' ').toUpperCase()}</Label>
-                    <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 mb-3 text-xs">
+            <div className="w-[220px]">
+              <Select value={selectedDocType} onValueChange={setSelectedDocType}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Choose document type" />
+                </SelectTrigger>
+                <SelectContent>
+                  {['aadhaar','pan','passport','driving-license','voter-id','other'].map((t) => (
+                    <SelectItem key={t} value={t}>{t.replace('-', ' ').toUpperCase()}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <Input id="doc-upload" type="file" className="hidden" onChange={(e) => handleDocumentChange(selectedDocType, e)} />
+            <Button asChild variant="outline"><Label htmlFor="doc-upload" className="cursor-pointer">Upload</Label></Button>
+          </div>
+
+          <div className="w-full md:w-1/2">
+            <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-3">
+              {['aadhaar','pan','passport','driving-license','voter-id','other'].map((docType) => {
+                const doc = (form.documents || []).find((d: any) => d.type === docType);
+                const url = doc?.url || '';
+                const isImage = url && /(\.png|\.jpg|\.jpeg|\.gif|\.webp)$/i.test(url);
+                if (!url) return null;
+                return (
+                  <div key={docType} className="p-3 border rounded-lg bg-white shadow-sm">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-sm font-semibold text-gray-700">{docType.replace('-', ' ').toUpperCase()}</span>
                       {url ? (
-                        <a href={url} target="_blank" rel="noreferrer" className="text-sm text-blue-600 underline">View</a>
+                        <a href={url} target="_blank" rel="noreferrer" className="text-xs text-blue-600 underline">View</a>
                       ) : (
-                        <span className="text-sm text-gray-500">No file uploaded</span>
+                        <span className="text-xs text-gray-400">No file</span>
                       )}
-                      <Input id={`doc-${docType}`} type="file" className="hidden" onChange={(e) => handleDocumentChange(docType, e)} />
-                      <Button asChild variant="outline">
-                        <Label htmlFor={`doc-${docType}`} className="cursor-pointer">{url ? 'Replace' : 'Upload'}</Label>
-                      </Button>
+                    </div>
+                    {isImage && url && (
+                      <div className="h-16 flex items-center justify-center border rounded bg-gray-50 overflow-hidden">
+                        <img src={url} alt={`${docType} preview`} className="h-16 rounded" />
+                      </div>
+                    )}
+                    <div className="mt-2">
+                      <Input id={`doc-${docType}-replace`} type="file" className="hidden" onChange={(e) => handleDocumentChange(docType, e)} />
+                      <Button asChild variant="outline" className="w-full"><Label htmlFor={`doc-${docType}-replace`} className="cursor-pointer">{url ? 'Replace' : 'Upload'}</Label></Button>
                     </div>
                   </div>
-                  {isImage && url && (
-                    <div className="mt-3">
-                      <img src={url} alt={`${docType} preview`} className="h-24 rounded border" />
-                    </div>
-                  )}
-                </div>
-              );
-            })}
+                );
+              })}
+            </div>
           </div>
 
           {/* Finance Details */}
