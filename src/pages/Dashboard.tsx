@@ -251,7 +251,7 @@ const Dashboard = () => {
           </div>
         </div>
         {/* Main Content */}
-        <div className="max-w-5xl mx-auto flex flex-col md:flex-row gap-6 items-stretch">
+        <div className="max-w-5xl mx-auto flex flex-col md:flex-row gap-6 items-start">
           {/* Left: Events (static for now) */}
           <div className="md:w-1/3 h-full">
             <div className="bg-white rounded-2xl shadow p-6 flex flex-col h-full">
@@ -293,9 +293,9 @@ const Dashboard = () => {
             </div>
           </div>
           {/* Right: Cards */}  
-          <div className="md:w-2/3 grid grid-cols-1 sm:grid-cols-2 gap-4 items-stretch">
+          <div className="md:w-2/3 grid grid-cols-1 sm:grid-cols-2 gap-4 items-start">
             {/* Total Attendance (full width) */}
-            <div className="bg-white rounded-2xl border-[1.5px] border-[#2C373B]/30 shadow-none p-3 sm:p-4 sm:col-span-2">
+            <div className="bg-white rounded-2xl border-[1.5px] border-[#2C373B]/30 shadow-none px-3 pt-3 pb-2 sm:px-4 sm:pt-4 sm:pb-2 sm:col-span-2">
               <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
                 <div className="flex items-center gap-3">
                   <div className="relative w-12 h-12 flex-shrink-0">
@@ -320,13 +320,13 @@ const Dashboard = () => {
                   View Attendance
                 </button>
               </div>
-              <div className="flex gap-6 text-xs mt-2">
+              <div className="flex gap-6 text-xs mt-1">
                 <span className="text-[#9E9E9E] font-medium">Present <span className="text-green-600 font-medium">{employeeDashboard?.attendance?.present ?? '-'}</span></span>
                 <span className="text-[#9E9E9E] font-medium">Absent <span className="text-red-500 font-medium">{employeeDashboard?.attendance?.absent ?? '-'}</span></span>
               </div>
             </div>
             {/* Leave Balance (full width) */}
-            <div className="bg-white rounded-2xl border-[1.5px] border-[#2C373B]/30 shadow-none p-3 sm:p-4 sm:col-span-2">
+            <div className="bg-white rounded-2xl border-[1.5px] border-[#2C373B]/30 shadow-none px-3 pt-3 pb-2 sm:px-4 sm:pt-4 sm:pb-2 sm:col-span-2">
               <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
                 <div className="flex items-center gap-3">
                   <div className="relative w-12 h-12 flex-shrink-0">
@@ -364,7 +364,7 @@ const Dashboard = () => {
               </div>
             </div>
             {/* Leave Policy */}
-            <div className="bg-white rounded-2xl border-[1.5px] border-[#2C373B]/30 shadow-none p-3 sm:p-4 flex flex-col justify-between">
+            <div className="bg-white rounded-2xl border-[1.5px] border-[#2C373B]/30 shadow-none px-3 pt-3 pb-2 sm:px-4 sm:pt-4 sm:pb-2 flex flex-col justify-between">
               <div className="flex items-center gap-3 mb-2">
                 <div className="relative w-12 h-12 flex-shrink-0">
                   <span className="absolute inset-0 rounded-full bg-[#EAF9F2]" />
@@ -378,7 +378,7 @@ const Dashboard = () => {
                 <span className="text-3xl font-bold leading-none text-[#4CDC9C]">{employeeDashboard?.leavePolicy?.activePolicyCount ?? '-'}</span>
                 <span className="text-base text-gray-700 font-medium mb-1">active policy</span>
               </div>
-              <div className="flex gap-4 text-xs font-medium mb-3">
+              <div className="flex gap-4 text-xs font-medium mb-1">
                 <span className="text-gray-400">Medical <span className="text-green-500 font-bold">{employeeDashboard?.leaveBalance?.medical ?? '-'}</span></span>
                 <span className="text-gray-400">Earned <span className="text-yellow-500 font-bold">{employeeDashboard?.leaveBalance?.earned ?? '-'}</span></span>
               </div>
@@ -390,7 +390,7 @@ const Dashboard = () => {
               </button>
             </div>
             {/* Payroll Processed */}
-            <div className="bg-white rounded-2xl border-[1.5px] border-[#2C373B]/30 shadow-none p-3 sm:p-4">
+            <div className="bg-white rounded-2xl border-[1.5px] border-[#2C373B]/30 shadow-none px-3 pt-3 pb-2 sm:px-4 sm:pt-4 sm:pb-2">
               <div className="flex flex-col gap-3">
                 <div className="flex items-center gap-3">
                   <div className="relative w-12 h-12 flex-shrink-0">
@@ -422,26 +422,6 @@ const Dashboard = () => {
                     View Payroll
                   </button>
                 </div>
-              </div>
-            </div>
-            {/* Reports */}
-            <div className="bg-white rounded-2xl border-[1.5px] border-[#2C373B]/30 shadow-none p-3 sm:p-4 sm:col-span-2">
-              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-                <div className="flex items-center gap-3">
-                  <div className="relative w-12 h-12 flex-shrink-0">
-                    <span className="absolute inset-0 rounded-full bg-[#EAF9F2]" />
-                    <span className="absolute top-2 left-2 w-8 h-8 rounded-full bg-[#2C373B] flex items-center justify-center">
-                      <FileText className="h-5 w-5 text-[#FFBB31]" />
-                    </span>
-                  </div>
-                  <div className="text-gray-700 text-base font-semibold">Reports</div>
-                </div>
-                <button
-                  className="w-full sm:w-auto bg-[#4CDC9C] text-[#2C373B] hover:bg-[#3fd190] rounded-lg px-4 py-2 text-[14px] font-medium transition"
-                  onClick={() => navigate('/reports/employees')}
-                >
-                  View Reports
-                </button>
               </div>
             </div>
           </div>
