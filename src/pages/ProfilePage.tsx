@@ -256,7 +256,7 @@ const ProfilePage = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-emerald-200 via-emerald-100 to-emerald-50 p-4 sm:p-8">
-      <h1 className="text-xl font-semibold mb-3 text-gray-800">Profile</h1>
+      {/* <h1 className="text-xl font-semibold mb-3 text-gray-800">Profile</h1> */}
       <Card className="w-full max-w-4xl mx-auto">
         <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle>Profile</CardTitle>
