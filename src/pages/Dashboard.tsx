@@ -221,7 +221,7 @@ const Dashboard = () => {
             </div>
             {/* Right: Clock icons + Metrics */}
             <div className="flex flex-col md:items-start w-full md:w-auto">
-              <div className="flex gap-4 mb-2 self-start">
+              <div className="flex gap-6 mb-3 self-start">
                 <button
                   type="button"
                   onClick={handleClockIn}
@@ -241,11 +241,11 @@ const Dashboard = () => {
                   {attendanceToday?.clockOut ? 'Clocked out' : 'Clock Out'}
                 </button>
               </div>
-              <div className="bg-white rounded-lg px-4 py-2 w-full md:w-auto self-start flex flex-col md:flex-row gap-6 items-start md:items-center shadow mt-auto">
-                <div className="text-xs text-gray-500 text-left md:text-right space-y-1"><div>Today's Date</div><span className="text-base text-gray-800 font-semibold">{format(new Date(), 'dd/MM/yyyy')}</span></div>
-                <div className="text-xs text-gray-500 text-left md:text-right space-y-1"><div>Clockin</div><span className="text-base text-gray-800 font-semibold">{attendanceToday?.clockIn ? format(new Date(attendanceToday.clockIn), 'HH:mm:ss') : '-'}</span></div>
-                <div className="text-xs text-gray-500 text-left md:text-right space-y-1"><div>Clockout</div><span className="text-base text-gray-800 font-semibold">{attendanceToday?.clockOut ? format(new Date(attendanceToday.clockOut), 'HH:mm:ss') : '-'}</span></div>
-                <div className="text-xs text-gray-500 text-left md:text-right space-y-1"><div>Working hours</div><span className="text-base text-gray-800 font-semibold">{attendanceToday?.totalWorkingHours != null ? `${attendanceToday.totalWorkingHours}` : '-'}</span></div>
+              <div className="bg-white rounded-lg px-6 py-3 w-full md:w-auto self-start flex flex-col md:flex-row gap-8 items-start md:items-center shadow mt-auto">
+                <div className="text-xs text-gray-500 text-left md:text-right space-y-2"><div>Today's Date</div><span className="text-base text-gray-800 font-semibold">{format(new Date(), 'dd/MM/yyyy')}</span></div>
+                <div className="text-xs text-gray-500 text-left md:text-right space-y-2"><div>Clockin</div><span className="text-base text-gray-800 font-semibold">{attendanceToday?.clockIn ? format(new Date(attendanceToday.clockIn), 'HH:mm:ss') : '-'}</span></div>
+                <div className="text-xs text-gray-500 text-left md:text-right space-y-2"><div>Clockout</div><span className="text-base text-gray-800 font-semibold">{attendanceToday?.clockOut ? format(new Date(attendanceToday.clockOut), 'HH:mm:ss') : '-'}</span></div>
+                <div className="text-xs text-gray-500 text-left md:text-right space-y-2"><div>Working hours</div><span className="text-base text-gray-800 font-semibold">{attendanceToday?.totalWorkingHours != null ? `${attendanceToday.totalWorkingHours}` : '-'}</span></div>
               </div>
             </div>
           </div>
@@ -253,10 +253,10 @@ const Dashboard = () => {
         {/* Main Content */}
         <div className="max-w-5xl mx-auto flex flex-col md:flex-row gap-6 items-stretch px-3 sm:px-4">
           {/* Left: Events (static for now) */}
-          <div className="w-full md:w-1/3 h-full mx-auto md:mx-0">
-            <div className="bg-white rounded-2xl shadow p-6 flex flex-col h-full">
+          <div className="w-full md:w-1/3 h-full mx-auto md:mx-0 self-stretch flex">
+            <div className="bg-white rounded-2xl shadow p-6 flex flex-col h-full min-h-full w-full">
               <div className="text-gray-500 text-sm mb-4 font-semibold">Today</div>
-              <div className="w-full flex-1 flex flex-col items-center md:min-h-[420px]">
+              <div className="w-full flex-1 min-h-0 flex flex-col items-stretch">
                 {calendarLoading ? (
                   <div className="w-full flex justify-center items-center h-full"><span className="text-gray-400">Loading...</span></div>
                 ) : calendarData?.calendarFile ? (
@@ -264,12 +264,12 @@ const Dashboard = () => {
                     <img 
                       src={calendarData.calendarFile} 
                       alt="Holiday Calendar" 
-                      className="w-full h-full object-cover rounded mb-2 border cursor-pointer" 
+                      className="w-full h-full object-contain rounded border cursor-pointer" 
                       onClick={() => setShowImageModal(true)}
                     />
                   </>
                 ) : (
-                  <span className="text-gray-400 mb-2">No calendar uploaded</span>
+                  <span className="text-gray-400">No calendar uploaded</span>
                 )}
               </div>
               {/* Upload Calendar input retained for future use; button removed as requested */}
@@ -284,7 +284,7 @@ const Dashboard = () => {
             </div>
           </div>
           {/* Right: Cards */}  
-          <div className="w-full md:w-2/3 h-full grid grid-cols-1 sm:grid-cols-2 gap-5 sm:gap-4 items-start mx-auto md:mx-0">
+          <div className="w-full md:w-2/3 h-full self-stretch grid grid-cols-1 sm:grid-cols-2 gap-5 sm:gap-4 items-start mx-auto md:mx-0">
             {/* Total Attendance (full width) */}
             <div className="bg-white rounded-2xl border-[1.5px] border-[#2C373B]/30 shadow-none px-3 pt-3 pb-3 sm:px-4 sm:pt-4 sm:pb-2 sm:col-span-2">
               <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
