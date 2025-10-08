@@ -251,9 +251,9 @@ const Dashboard = () => {
           </div>
         </div>
         {/* Main Content */}
-        <div className="max-w-5xl mx-auto flex flex-col md:flex-row gap-6 items-start">
+        <div className="max-w-5xl mx-auto flex flex-col md:flex-row gap-6 items-start px-3 sm:px-4">
           {/* Left: Events (static for now) */}
-          <div className="md:w-1/3 h-full">
+          <div className="w-full md:w-1/3 h-full max-w-sm mx-auto md:max-w-none md:mx-0">
             <div className="bg-white rounded-2xl shadow p-6 flex flex-col h-full">
               <div className="text-gray-500 text-sm mb-4 font-semibold">Today</div>
               <div className="w-full flex-1 flex flex-col items-center md:min-h-[420px]">
@@ -284,9 +284,9 @@ const Dashboard = () => {
             </div>
           </div>
           {/* Right: Cards */}  
-          <div className="md:w-2/3 grid grid-cols-1 sm:grid-cols-2 gap-4 items-start">
+          <div className="w-full md:w-2/3 grid grid-cols-1 sm:grid-cols-2 gap-5 sm:gap-4 items-start max-w-sm mx-auto md:max-w-none md:mx-0">
             {/* Total Attendance (full width) */}
-            <div className="bg-white rounded-2xl border-[1.5px] border-[#2C373B]/30 shadow-none px-3 pt-3 pb-2 sm:px-4 sm:pt-4 sm:pb-2 sm:col-span-2">
+            <div className="bg-white rounded-2xl border-[1.5px] border-[#2C373B]/30 shadow-none px-3 pt-3 pb-3 sm:px-4 sm:pt-4 sm:pb-2 sm:col-span-2">
               <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
                 <div className="flex items-center gap-3">
                   <div className="relative w-12 h-12 flex-shrink-0">
@@ -311,13 +311,13 @@ const Dashboard = () => {
                   View Attendance
                 </button>
               </div>
-              <div className="flex gap-6 text-xs mt-1">
+              <div className="flex gap-6 text-xs mt-2 sm:mt-1">
                 <span className="text-[#9E9E9E] font-medium">Present <span className="text-green-600 font-medium">{employeeDashboard?.attendance?.present ?? '-'}</span></span>
                 <span className="text-[#9E9E9E] font-medium">Absent <span className="text-red-500 font-medium">{employeeDashboard?.attendance?.absent ?? '-'}</span></span>
               </div>
             </div>
             {/* Leave Balance (full width) */}
-            <div className="bg-white rounded-2xl border-[1.5px] border-[#2C373B]/30 shadow-none px-3 pt-3 pb-2 sm:px-4 sm:pt-4 sm:pb-2 sm:col-span-2">
+            <div className="bg-white rounded-2xl border-[1.5px] border-[#2C373B]/30 shadow-none px-3 pt-3 pb-3 sm:px-4 sm:pt-4 sm:pb-2 sm:col-span-2">
               <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
                 <div className="flex items-center gap-3">
                   <div className="relative w-12 h-12 flex-shrink-0">
