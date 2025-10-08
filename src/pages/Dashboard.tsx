@@ -242,10 +242,10 @@ const Dashboard = () => {
                 </button>
               </div>
               <div className="bg-white rounded-lg px-6 py-3 w-full md:w-auto self-start flex flex-col md:flex-row gap-8 items-start md:items-center shadow mt-auto">
-                <div className="text-xs text-gray-500 text-left md:text-right space-y-2"><div>Today's Date</div><span className="text-base text-gray-800 font-semibold">{format(new Date(), 'dd/MM/yyyy')}</span></div>
-                <div className="text-xs text-gray-500 text-left md:text-right space-y-2"><div>Clockin</div><span className="text-base text-gray-800 font-semibold">{attendanceToday?.clockIn ? format(new Date(attendanceToday.clockIn), 'HH:mm:ss') : '-'}</span></div>
-                <div className="text-xs text-gray-500 text-left md:text-right space-y-2"><div>Clockout</div><span className="text-base text-gray-800 font-semibold">{attendanceToday?.clockOut ? format(new Date(attendanceToday.clockOut), 'HH:mm:ss') : '-'}</span></div>
-                <div className="text-xs text-gray-500 text-left md:text-right space-y-2"><div>Working hours</div><span className="text-base text-gray-800 font-semibold">{attendanceToday?.totalWorkingHours != null ? `${attendanceToday.totalWorkingHours}` : '-'}</span></div>
+                <div className="text-xs text-gray-600 font-semibold text-left md:text-right space-y-2"><div>Today's Date</div><span className="text-[14px] text-gray-800 font-normal">{format(new Date(), 'dd/MM/yyyy')}</span></div>
+                <div className="text-xs text-gray-600 font-semibold text-left md:text-right space-y-2"><div>Clockin</div><span className="text-[14px] text-gray-800 font-normal">{attendanceToday?.clockIn ? format(new Date(attendanceToday.clockIn), 'HH:mm:ss') : '-'}</span></div>
+                <div className="text-xs text-gray-600 font-semibold text-left md:text-right space-y-2"><div>Clockout</div><span className="text-[14px] text-gray-800 font-normal">{attendanceToday?.clockOut ? format(new Date(attendanceToday.clockOut), 'HH:mm:ss') : '-'}</span></div>
+                <div className="text-xs text-gray-600 font-semibold text-left md:text-right space-y-2"><div>Working hours</div><span className="text-[14px] text-gray-800 font-normal">{attendanceToday?.totalWorkingHours != null ? `${attendanceToday.totalWorkingHours}` : '-'}</span></div>
               </div>
             </div>
           </div>
