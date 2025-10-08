@@ -38,7 +38,8 @@ export interface CreateLeaveRequestPayload {
   leaveType: string;
   days: number;
   employeeId: string;
-  documentUrl?: string;
+  documentUrl?: string; // legacy single URL support
+  documentUrls?: string[]; // new multi-file support
 }
 
 export const createLeaveRequest = async (

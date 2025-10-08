@@ -33,7 +33,8 @@ const ApplyLeave = () => {
   const [days, setDays] = useState<number>(0);
   const [reason, setReason] = useState('');
   const [documentUrl, setDocumentUrl] = useState<string | undefined>();
-  const [documentPreview, setDocumentPreview] = useState<string | undefined>();
+  const [documentUrls, setDocumentUrls] = useState<string[]>([]);
+  const [documentPreviews, setDocumentPreviews] = useState<string[]>([]);
   const [uploading, setUploading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [requests, setRequests] = useState<LeaveRequestsResponse | null>(null);
@@ -91,26 +92,51 @@ const ApplyLeave = () => {
   };
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+    const files = e.target.files ? Array.from(e.target.files) : [];
+    if (files.length === 0) return;
+    const existingCount = documentUrls.length;
+    const availableSlots = Math.max(0, 5 - existingCount);
+    const toUpload = files.slice(0, availableSlots);
+    if (toUpload.length === 0) {
+      alert('You can upload up to 5 images.');
+      e.currentTarget.value = '';
+      return;
+    }
     setUploading(true);
     try {
-      const url = await uploadFile(file);
-      setDocumentUrl(url);
-      // Show preview for images only
-      if (file.type.startsWith('image/')) {
-        setDocumentPreview(url);
-      } else {
-        setDocumentPreview(undefined);
+      const uploaded: string[] = [];
+      const previews: string[] = [];
+      for (const file of toUpload) {
+        const url = await uploadFile(file);
+        uploaded.push(url);
+        if (file.type.startsWith('image/')) {
+          previews.push(url);
+        }
+      }
+      const nextUrls = [...documentUrls, ...uploaded].slice(0, 5);
+      const nextPreviews = [...documentPreviews, ...previews].slice(0, 5);
+      setDocumentUrls(nextUrls);
+      setDocumentPreviews(nextPreviews);
+      // Maintain legacy single URL (first)
+      if (!documentUrl && nextUrls.length > 0) {
+        setDocumentUrl(nextUrls[0]);
       }
     } catch (err) {
       console.error('File upload failed', err);
       alert('File upload failed');
     } finally {
       setUploading(false);
-      // reset file input value
       e.currentTarget.value = '';
     }
+  };
+
+  const removeDocumentAt = (idx: number) => {
+    const nextUrls = documentUrls.filter((_, i) => i !== idx);
+    setDocumentUrls(nextUrls);
+    const nextPreviews = documentPreviews.filter((_, i) => i !== idx);
+    setDocumentPreviews(nextPreviews);
+    // keep legacy single documentUrl in sync
+    setDocumentUrl(nextUrls[0]);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -131,6 +157,7 @@ const ApplyLeave = () => {
       days,
       employeeId,
       documentUrl,
+      documentUrls: documentUrls.length ? documentUrls : undefined,
     };
     setSubmitting(true);
     try {
@@ -262,24 +289,37 @@ const ApplyLeave = () => {
             <Textarea rows={4} value={reason} onChange={(e) => setReason(e.target.value)} placeholder="Reason for leave" className="bg-[rgb(209,250,229)] text-[#2C373B] hover:bg-green-100 hover:border-[#9AE6B4]" />
           </div>
 
-          <div className="grid grid-cols-[100px_1fr] gap-4 items-center">
-            <div className="h-20 border rounded-lg bg-[rgb(209,250,229)] flex items-center justify-center overflow-hidden">
-              {documentPreview ? (
-                <img src={documentPreview} alt="uploaded" className="h-full w-full object-cover" />
+          <div className="space-y-2">
+            <Label>Documents (max 5)</Label>
+            <div className="flex flex-wrap gap-3">
+              {documentPreviews.length > 0 ? (
+                documentPreviews.map((src, idx) => (
+                  <div key={idx} className="relative h-20 w-20 border rounded-lg bg-[rgb(209,250,229)] overflow-hidden">
+                    <img src={src} alt={`doc-${idx}`} className="h-full w-full object-cover" />
+                    <button type="button" onClick={() => removeDocumentAt(idx)} className="absolute top-1 right-1 bg-white/80 rounded-full p-0.5">
+                      <X className="h-3 w-3" />
+                    </button>
+                  </div>
+                ))
               ) : (
-                <Upload className="h-6 w-6 text-muted-foreground" />
+                <div className="h-20 w-20 border rounded-lg bg-[rgb(209,250,229)] flex items-center justify-center">
+                  <Upload className="h-6 w-6 text-muted-foreground" />
+                </div>
+              )}
+              {/* non-image files indicator */}
+              {documentUrls.length > documentPreviews.length && (
+                <span className="text-xs text-muted-foreground">{documentUrls.length - documentPreviews.length} file(s) attached</span>
               )}
             </div>
-            <div className="flex items-center gap-3">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-3 w-full">
               <input
                 type="file"
-                accept="image/*,.pdf,.doc,.docx"
+                accept="image/*"
+                multiple
                 onChange={handleFileChange}
-                className="border rounded-md p-2 bg-white text-[#2C373B] hover:border-[#9AE6B4]"
+                className="w-full sm:w-auto border rounded-md p-2 bg-white text-[#2C373B] hover:border-[#9AE6B4]"
               />
-              {documentUrl && !documentPreview && (
-                <span className="text-sm text-muted-foreground">File attached</span>
-              )}
+              <span className="text-xs text-muted-foreground break-words sm:whitespace-nowrap">You can upload up to 5 images.</span>
             </div>
           </div>
 
