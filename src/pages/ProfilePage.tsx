@@ -63,6 +63,7 @@ const ProfilePage = () => {
     emergencyContactRelation: '',
     emergencyContactPhone: '',
     activeOrganization: true,
+    documents: [],
   });
   const [initialForm, setInitialForm] = useState(form);
   const [error, setError] = useState('');
@@ -119,6 +120,7 @@ const ProfilePage = () => {
           emergencyContactRelation: data.emergencyContact?.relationship || '',
           emergencyContactPhone: data.emergencyContact?.phone || '',
           activeOrganization: data.active || true,
+          documents: data.documents || [],
         };
         setForm(formData);
         setInitialForm(formData);
@@ -153,6 +155,37 @@ const ProfilePage = () => {
     }
   };
 
+  const handleDocumentChange = async (
+    type: string,
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      try {
+        const url = await uploadFile(file);
+        setForm((prev) => {
+          const existingIndex = (prev.documents || []).findIndex(
+            (d: any) => d.type === type
+          );
+          const newEntry = {
+            type,
+            url,
+            uploadedAt: new Date().toISOString(),
+          };
+          let updatedDocs = Array.isArray(prev.documents) ? [...prev.documents] : [];
+          if (existingIndex >= 0) {
+            updatedDocs[existingIndex] = newEntry;
+          } else {
+            updatedDocs.push(newEntry);
+          }
+          return { ...prev, documents: updatedDocs };
+        });
+      } catch (err) {
+        setError('Failed to upload document');
+      }
+    }
+  };
+
   const handleDiscard = () => {
     setForm(initialForm);
   };
@@ -161,7 +194,7 @@ const ProfilePage = () => {
     setError('');
     setSuccess('');
     try {
-   const res = await API.put(`/auth/employees/${user._id || user.id}`, {
+  const res = await API.put(`/auth/employees/${user._id || user.id}`, {
   firstName: form.firstName,
   lastName: form.lastName,
   phone: form.phone,
@@ -202,6 +235,7 @@ const ProfilePage = () => {
     relationship: form.emergencyContactRelation,
     phone: form.emergencyContactPhone,
   },
+  documents: form.documents,
 
   loginEnabled: true,
   isActive: form.activeOrganization,
@@ -296,6 +330,39 @@ const ProfilePage = () => {
               <div><Label htmlFor="addressCity">City</Label><Input id="addressCity" name="addressCity" value={form.addressCity} onChange={handleChange} /></div>
               <div><Label htmlFor="addressZipCode">Zip Code</Label><Input id="addressZipCode" name="addressZipCode" value={form.addressZipCode} onChange={handleChange} /></div>
             </div>
+          </div>
+
+          {/* Documents */}
+          <h2 className="text-xl font-semibold mt-8 mb-4">Documents</h2>
+          <div className="space-y-6">
+            {['aadhaar','pan','passport','driving-license','voter-id','other'].map((docType) => {
+              const doc = (form.documents || []).find((d: any) => d.type === docType);
+              const url = doc?.url || '';
+              const isImage = url && /(\.png|\.jpg|\.jpeg|\.gif|\.webp)$/i.test(url);
+              return (
+                <div key={docType} className="p-4 border rounded-lg bg-gray-50">
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor={`doc-${docType}`}>{docType.replace('-', ' ').toUpperCase()}</Label>
+                    <div className="flex items-center gap-3">
+                      {url ? (
+                        <a href={url} target="_blank" rel="noreferrer" className="text-sm text-blue-600 underline">View</a>
+                      ) : (
+                        <span className="text-sm text-gray-500">No file uploaded</span>
+                      )}
+                      <Input id={`doc-${docType}`} type="file" className="hidden" onChange={(e) => handleDocumentChange(docType, e)} />
+                      <Button asChild variant="outline">
+                        <Label htmlFor={`doc-${docType}`} className="cursor-pointer">{url ? 'Replace' : 'Upload'}</Label>
+                      </Button>
+                    </div>
+                  </div>
+                  {isImage && url && (
+                    <div className="mt-3">
+                      <img src={url} alt={`${docType} preview`} className="h-24 rounded border" />
+                    </div>
+                  )}
+                </div>
+              );
+            })}
           </div>
 
           {/* Finance Details */}
