@@ -104,10 +104,11 @@ const Settings = () => {
   };
 
   return (
-    <div className="p-6 max-w-2xl mx-auto">
-      <h1 className="text-3xl font-bold mb-2 text-black">Settings</h1>
-      <p className="text-muted-foreground mb-6">View and update your credentials</p>
-      <Card className="hrms-card">
+    <div className="min-h-screen bg-gradient-to-br from-emerald-200 via-emerald-100 to-emerald-50 p-6">
+      <div className="max-w-2xl mx-auto">
+        <h1 className="text-3xl font-bold mb-2 text-black">Settings</h1>
+        <p className="text-muted-foreground mb-6">View and update your credentials</p>
+        <Card className="hrms-card">
         <CardHeader>
           <CardTitle>Your Details</CardTitle>
         </CardHeader>
@@ -153,7 +154,8 @@ const Settings = () => {
             )}
           </div>
         </CardContent>
-      </Card>
+        </Card>
+      </div>
     </div>
   );
 };
