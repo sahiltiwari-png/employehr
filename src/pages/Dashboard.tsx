@@ -256,7 +256,7 @@ const Dashboard = () => {
           <div className="md:w-1/3 h-full">
             <div className="bg-white rounded-2xl shadow p-6 flex flex-col h-full">
               <div className="text-gray-500 text-sm mb-4 font-semibold">Today</div>
-              <div className="w-full flex-1 flex flex-col items-center md:min-h-[580px]">
+              <div className="w-full flex-1 flex flex-col items-center md:min-h-[420px]">
                 {calendarLoading ? (
                   <div className="w-full flex justify-center items-center h-full"><span className="text-gray-400">Loading...</span></div>
                 ) : calendarData?.calendarFile ? (
@@ -272,6 +272,7 @@ const Dashboard = () => {
                   <span className="text-gray-400 mb-2">No calendar uploaded</span>
                 )}
               </div>
+              {/* Upload Calendar input retained for future use; button removed as requested */}
               <input
                 id="calendar-upload-input"
                 type="file"
@@ -280,16 +281,6 @@ const Dashboard = () => {
                 style={{ display: 'none' }}
                 onChange={handleCalendarUpload}
               />
-              <button
-                type="button"
-                className="flex items-center gap-2 text-green-600 hover:text-green-800 text-xs font-semibold border border-green-200 rounded px-3 py-1 bg-green-50 mt-2"
-                onClick={() => {
-                  if (fileInputRef.current) fileInputRef.current.click();
-                }}
-              >
-                <svg width="18" height="18" fill="none" viewBox="0 0 24 24"><path d="M12 16v-8M8 12h8" stroke="#3CC78F" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/><rect x="3" y="3" width="18" height="18" rx="4" stroke="#3CC78F" strokeWidth="1.5"/></svg>
-                Upload Calendar
-              </button>
             </div>
           </div>
           {/* Right: Cards */}  
@@ -364,7 +355,7 @@ const Dashboard = () => {
               </div>
             </div>
             {/* Leave Policy */}
-            <div className="bg-white rounded-2xl border-[1.5px] border-[#2C373B]/30 shadow-none px-3 pt-3 pb-2 sm:px-4 sm:pt-4 sm:pb-2 flex flex-col justify-between">
+            <div className="bg-white rounded-2xl border-[1.5px] border-[#2C373B]/30 shadow-none px-3 pt-3 pb-3 sm:px-4 sm:pt-4 sm:pb-3 flex flex-col justify-between">
               <div className="flex items-center gap-3 mb-2">
                 <div className="relative w-12 h-12 flex-shrink-0">
                   <span className="absolute inset-0 rounded-full bg-[#EAF9F2]" />
@@ -383,15 +374,15 @@ const Dashboard = () => {
                 <span className="text-gray-400">Earned <span className="text-yellow-500 font-bold">{employeeDashboard?.leaveBalance?.earned ?? '-'}</span></span>
               </div>
               <button 
-                className="w-[85%] mx-auto bg-[#4CDC9C] text-[#2C373B] hover:bg-[#3fd190] rounded-lg py-2 text-[14px] font-medium transition shadow-none"
+                className="w-full bg-[#4CDC9C] text-[#2C373B] hover:bg-[#3fd190] rounded-lg py-2 text-[14px] font-medium transition shadow-none"
                 onClick={() => navigate('/leaves/policy')}
               >
                 View Leave Policy
               </button>
             </div>
             {/* Payroll Processed */}
-            <div className="bg-white rounded-2xl border-[1.5px] border-[#2C373B]/30 shadow-none px-3 pt-3 pb-2 sm:px-4 sm:pt-4 sm:pb-2">
-              <div className="flex flex-col gap-3">
+            <div className="bg-white rounded-2xl border-[1.5px] border-[#2C373B]/30 shadow-none px-3 pt-3 pb-3 sm:px-4 sm:pt-4 sm:pb-3 flex flex-col">
+              <div className="flex flex-col gap-3 h-full">
                 <div className="flex items-center gap-3">
                   <div className="relative w-12 h-12 flex-shrink-0">
                     <span className="absolute inset-0 rounded-full bg-[#EAF9F2]" />
@@ -408,7 +399,7 @@ const Dashboard = () => {
                   <div className="mb-1">Payment Date - {employeeDashboard?.payroll?.paymentDate ? format(new Date(employeeDashboard.payroll.paymentDate), 'dd/MM/yyyy') : '-'}</div>
                   <div>Net Salary <span className="text-[#4CDC9C] font-semibold">₹{employeeDashboard?.payroll?.netSalary ?? 0}</span></div>
                 </div>
-                <div className="flex gap-2">
+                <div className="flex gap-2 mt-auto">
                   <button
                     className="bg-white border border-[#2C373B]/30 text-[#2C373B] rounded-lg px-3 py-2 text-[14px] font-medium transition hover:bg-gray-50"
                     onClick={() => navigate('/salary-slips')}
