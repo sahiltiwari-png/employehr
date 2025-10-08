@@ -253,7 +253,7 @@ const Dashboard = () => {
         {/* Main Content */}
         <div className="max-w-5xl mx-auto flex flex-col md:flex-row gap-6 items-start px-3 sm:px-4">
           {/* Left: Events (static for now) */}
-          <div className="w-full md:w-1/3 h-full max-w-sm mx-auto md:max-w-none md:mx-0">
+          <div className="w-full md:w-1/3 h-full mx-auto md:mx-0">
             <div className="bg-white rounded-2xl shadow p-6 flex flex-col h-full">
               <div className="text-gray-500 text-sm mb-4 font-semibold">Today</div>
               <div className="w-full flex-1 flex flex-col items-center md:min-h-[420px]">
@@ -284,7 +284,7 @@ const Dashboard = () => {
             </div>
           </div>
           {/* Right: Cards */}  
-          <div className="w-full md:w-2/3 grid grid-cols-1 sm:grid-cols-2 gap-5 sm:gap-4 items-start max-w-sm mx-auto md:max-w-none md:mx-0">
+          <div className="w-full md:w-2/3 grid grid-cols-1 sm:grid-cols-2 gap-5 sm:gap-4 items-start mx-auto md:mx-0">
             {/* Total Attendance (full width) */}
             <div className="bg-white rounded-2xl border-[1.5px] border-[#2C373B]/30 shadow-none px-3 pt-3 pb-3 sm:px-4 sm:pt-4 sm:pb-2 sm:col-span-2">
               <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">

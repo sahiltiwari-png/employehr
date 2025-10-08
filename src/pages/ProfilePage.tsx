@@ -219,7 +219,7 @@ const ProfilePage = () => {
   };
 
   return (
-    <div className="bg-[#4CDC9C] p-4 sm:p-8 min-h-screen">
+    <div className="p-4 sm:p-8">
       <h1 className="text-2xl font-bold mb-4 text-gray-800">Profile</h1>
       <Card className="w-full max-w-4xl mx-auto">
         <CardHeader className="flex flex-row items-center justify-between">

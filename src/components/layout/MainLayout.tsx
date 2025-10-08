@@ -61,11 +61,11 @@ const MainLayout = ({ children }: MainLayoutProps) => {
       
       <div className="flex-1 flex flex-col">
         {/* Header */}
-        <header className={`sticky top-0 z-40 border-b ${isSettingsPage ? 'bg-[#4CDC9C]' : 'bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60'}`}>
+        <header className="sticky top-0 z-40 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
           <div className="container flex h-14 items-center justify-between px-4">
             <div className="flex items-center gap-4 w-full">
               <SidebarTrigger />
-              {user?.role === 'superAdmin' && !isSettingsPage ? (
+              {user?.role === 'superAdmin' ? (
                 <Input
                   type="text"
                   placeholder="Search organizations..."
@@ -74,16 +74,6 @@ const MainLayout = ({ children }: MainLayoutProps) => {
                   onChange={e => setSearch(e.target.value)}
                 />
               ) : null}
-               {isSettingsPage && (
-                <div className="relative w-full">
-                  <Input
-                    type="search"
-                    placeholder="Search organization"
-                    className="w-full pr-10 pl-4 bg-white rounded-full"
-                  />
-                  <Search className="absolute right-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-500" />
-                </div>
-              )}
             </div>
 
             <div className="flex items-center gap-4 pl-4">
