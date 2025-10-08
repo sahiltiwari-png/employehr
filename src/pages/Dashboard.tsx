@@ -221,7 +221,7 @@ const Dashboard = () => {
             </div>
             {/* Right: Clock icons + Metrics */}
             <div className="flex flex-col md:items-start w-full md:w-auto">
-              <div className="flex gap-2 mb-2 self-start">
+              <div className="flex gap-4 mb-2 self-start">
                 <button
                   type="button"
                   onClick={handleClockIn}
@@ -241,17 +241,17 @@ const Dashboard = () => {
                   {attendanceToday?.clockOut ? 'Clocked out' : 'Clock Out'}
                 </button>
               </div>
-              <div className="bg-white rounded-lg px-4 py-2 w-full md:w-auto self-start flex flex-col md:flex-row gap-4 items-start md:items-center shadow">
-                <div className="text-xs text-gray-500 text-left md:text-right">Date<br /><span className="text-base text-gray-800 font-semibold">{format(new Date(), 'dd/MM/yyyy')}</span></div>
-                <div className="text-xs text-gray-500 text-left md:text-right">Clockin<br /><span className="text-base text-gray-800 font-semibold">{attendanceToday?.clockIn ? format(new Date(attendanceToday.clockIn), 'HH:mm:ss') : '-'}</span></div>
-                <div className="text-xs text-gray-500 text-left md:text-right">Clockout<br /><span className="text-base text-gray-800 font-semibold">{attendanceToday?.clockOut ? format(new Date(attendanceToday.clockOut), 'HH:mm:ss') : '-'}</span></div>
-                <div className="text-xs text-gray-500 text-left md:text-right">Working hours<br /><span className="text-base text-gray-800 font-semibold">{attendanceToday?.totalWorkingHours != null ? `${attendanceToday.totalWorkingHours}` : '-'}</span></div>
+              <div className="bg-white rounded-lg px-4 py-2 w-full md:w-auto self-start flex flex-col md:flex-row gap-6 items-start md:items-center shadow mt-auto">
+                <div className="text-xs text-gray-500 text-left md:text-right space-y-1"><div>Today's Date</div><span className="text-base text-gray-800 font-semibold">{format(new Date(), 'dd/MM/yyyy')}</span></div>
+                <div className="text-xs text-gray-500 text-left md:text-right space-y-1"><div>Clockin</div><span className="text-base text-gray-800 font-semibold">{attendanceToday?.clockIn ? format(new Date(attendanceToday.clockIn), 'HH:mm:ss') : '-'}</span></div>
+                <div className="text-xs text-gray-500 text-left md:text-right space-y-1"><div>Clockout</div><span className="text-base text-gray-800 font-semibold">{attendanceToday?.clockOut ? format(new Date(attendanceToday.clockOut), 'HH:mm:ss') : '-'}</span></div>
+                <div className="text-xs text-gray-500 text-left md:text-right space-y-1"><div>Working hours</div><span className="text-base text-gray-800 font-semibold">{attendanceToday?.totalWorkingHours != null ? `${attendanceToday.totalWorkingHours}` : '-'}</span></div>
               </div>
             </div>
           </div>
         </div>
         {/* Main Content */}
-        <div className="max-w-5xl mx-auto flex flex-col md:flex-row gap-6 items-start px-3 sm:px-4">
+        <div className="max-w-5xl mx-auto flex flex-col md:flex-row gap-6 items-stretch px-3 sm:px-4">
           {/* Left: Events (static for now) */}
           <div className="w-full md:w-1/3 h-full mx-auto md:mx-0">
             <div className="bg-white rounded-2xl shadow p-6 flex flex-col h-full">
@@ -284,7 +284,7 @@ const Dashboard = () => {
             </div>
           </div>
           {/* Right: Cards */}  
-          <div className="w-full md:w-2/3 grid grid-cols-1 sm:grid-cols-2 gap-5 sm:gap-4 items-start mx-auto md:mx-0">
+          <div className="w-full md:w-2/3 h-full grid grid-cols-1 sm:grid-cols-2 gap-5 sm:gap-4 items-start mx-auto md:mx-0">
             {/* Total Attendance (full width) */}
             <div className="bg-white rounded-2xl border-[1.5px] border-[#2C373B]/30 shadow-none px-3 pt-3 pb-3 sm:px-4 sm:pt-4 sm:pb-2 sm:col-span-2">
               <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
