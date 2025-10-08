@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { AuthProvider } from "./contexts/AuthContext";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
+import EmployeeRoute from "./components/auth/EmployeeRoute";
 
 // Pages
 import Login from "./pages/Login";
@@ -54,9 +55,10 @@ const App = () => (
             <Route path="/login" element={<Login />} />
             <Route path="/*" element={
               <ProtectedRoute>
-                <SidebarProvider>
-                  <MainLayout>
-                    <Routes>
+                <EmployeeRoute>
+                  <SidebarProvider>
+                    <MainLayout>
+                      <Routes>
                       <Route path="/" element={<Navigate to="/dashboard" replace />} />
                       <Route path="/dashboard" element={<Dashboard />} />
                       <Route path="/employees" element={<Employees />} />
@@ -91,6 +93,7 @@ const App = () => (
                     </Routes>
                   </MainLayout>
                 </SidebarProvider>
+              </EmployeeRoute>
               </ProtectedRoute>
             } />
           </Routes>
