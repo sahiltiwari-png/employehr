@@ -298,8 +298,11 @@ const Dashboard = () => {
             <div className="bg-white rounded-2xl border-[1.5px] border-[#2C373B]/30 shadow-none p-3 sm:p-4 sm:col-span-2">
               <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
                 <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center">
-                    <Users className="h-5 w-5 text-green-600" />
+                  <div className="relative w-12 h-12 flex-shrink-0">
+                    <span className="absolute inset-0 rounded-full bg-[#EAF9F2]" />
+                    <span className="absolute top-2 left-2 w-8 h-8 rounded-full bg-[#2C373B] flex items-center justify-center">
+                      <Users className="h-5 w-5 text-[#FFBB31]" />
+                    </span>
                   </div>
                   <div>
                     <div className="text-gray-700 text-base font-semibold">Total Attendance</div>
@@ -311,7 +314,7 @@ const Dashboard = () => {
                   <span className="text-gray-700 text-lg font-semibold">/{employeeDashboard?.attendance?.totalDays ?? '-'}</span>
                 </div>
                 <button
-                  className="w-full sm:w-auto bg-[#4CDC9C] text-[#2C373B] hover:bg-[#3fd190] rounded-lg px-4 py-2 font-semibold transition"
+                  className="w-full sm:w-auto bg-[#4CDC9C] text-[#2C373B] hover:bg-[#3fd190] rounded-lg px-4 py-2 text-[14px] font-medium transition"
                   onClick={() => navigate('/attendance')}
                 >
                   View Attendance
@@ -326,8 +329,11 @@ const Dashboard = () => {
             <div className="bg-white rounded-2xl border-[1.5px] border-[#2C373B]/30 shadow-none p-3 sm:p-4 sm:col-span-2">
               <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
                 <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center">
-                    <ClipboardList className="h-5 w-5 text-green-600" />
+                  <div className="relative w-12 h-12 flex-shrink-0">
+                    <span className="absolute inset-0 rounded-full bg-[#EAF9F2]" />
+                    <span className="absolute top-2 left-2 w-8 h-8 rounded-full bg-[#2C373B] flex items-center justify-center">
+                      <ClipboardList className="h-5 w-5 text-[#FFBB31]" />
+                    </span>
                   </div>
                   <div>
                     <div className="text-gray-700 text-base font-semibold">Leave Balance</div>
@@ -338,13 +344,13 @@ const Dashboard = () => {
                 </div>
                 <div className="flex gap-2">
                   <button
-                    className="bg-white border border-[#2C373B]/30 text-[#2C373B] rounded-lg px-3 py-2 font-semibold transition hover:bg-gray-50"
+                    className="bg-white border border-[#2C373B]/30 text-[#2C373B] rounded-lg px-3 py-2 text-[14px] font-medium transition hover:bg-gray-50"
                     onClick={() => navigate('/leaves/balance')}
                   >
                     View Balance
                   </button>
                   <button
-                    className="bg-[#4CDC9C] text-[#2C373B] hover:bg-[#3fd190] rounded-lg px-3 py-2 font-semibold transition"
+                    className="bg-[#4CDC9C] text-[#2C373B] hover:bg-[#3fd190] rounded-lg px-3 py-2 text-[14px] font-medium transition"
                     onClick={() => navigate('/apply-leave')}
                   >
                     Apply Leave
@@ -360,8 +366,11 @@ const Dashboard = () => {
             {/* Leave Policy */}
             <div className="bg-white rounded-2xl border-[1.5px] border-[#2C373B]/30 shadow-none p-3 sm:p-4 flex flex-col justify-between">
               <div className="flex items-center gap-3 mb-2">
-                <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center">
-                  <svg width="20" height="20" fill="none" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="4" fill="#3CC78F" fillOpacity="0.15"/><path d="M8.5 10.5h7M8.5 13.5h4M12 7.5v9" stroke="#3CC78F" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                <div className="relative w-12 h-12 flex-shrink-0">
+                  <span className="absolute inset-0 rounded-full bg-[#EAF9F2]" />
+                  <span className="absolute top-2 left-2 w-8 h-8 rounded-full bg-[#2C373B] flex items-center justify-center">
+                    <svg width="20" height="20" fill="none" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="4" fill="#FFBB31" fillOpacity="0.15"/><path d="M8.5 10.5h7M8.5 13.5h4M12 7.5v9" stroke="#FFBB31" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                  </span>
                 </div>
                 <span className="text-gray-700 font-semibold text-base">Leave Policy</span>
               </div>
@@ -374,7 +383,7 @@ const Dashboard = () => {
                 <span className="text-gray-400">Earned <span className="text-yellow-500 font-bold">{employeeDashboard?.leaveBalance?.earned ?? '-'}</span></span>
               </div>
               <button 
-                className="w-[85%] mx-auto bg-[#4CDC9C] text-[#2C373B] hover:bg-[#3fd190] rounded-lg py-2 font-semibold transition text-base shadow-none"
+                className="w-[85%] mx-auto bg-[#4CDC9C] text-[#2C373B] hover:bg-[#3fd190] rounded-lg py-2 text-[14px] font-medium transition shadow-none"
                 onClick={() => navigate('/leaves/policy')}
               >
                 View Leave Policy
@@ -384,8 +393,11 @@ const Dashboard = () => {
             <div className="bg-white rounded-2xl border-[1.5px] border-[#2C373B]/30 shadow-none p-3 sm:p-4">
               <div className="flex flex-col gap-3">
                 <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center">
-                    <Calculator className="h-5 w-5 text-green-600" />
+                  <div className="relative w-12 h-12 flex-shrink-0">
+                    <span className="absolute inset-0 rounded-full bg-[#EAF9F2]" />
+                    <span className="absolute top-2 left-2 w-8 h-8 rounded-full bg-[#2C373B] flex items-center justify-center">
+                      <Calculator className="h-5 w-5 text-[#FFBB31]" />
+                    </span>
                   </div>
                   <div>
                     <div className="text-gray-700 text-base font-semibold">Payroll Processed</div>
@@ -398,13 +410,13 @@ const Dashboard = () => {
                 </div>
                 <div className="flex gap-2">
                   <button
-                    className="bg-white border border-[#2C373B]/30 text-[#2C373B] rounded-lg px-3 py-2 font-semibold transition hover:bg-gray-50"
+                    className="bg-white border border-[#2C373B]/30 text-[#2C373B] rounded-lg px-3 py-2 text-[14px] font-medium transition hover:bg-gray-50"
                     onClick={() => navigate('/salary-slips')}
                   >
                     Salary Slip
                   </button>
                   <button 
-                    className="bg-[#4CDC9C] text-[#2C373B] hover:bg-[#3fd190] rounded-lg px-3 py-2 font-semibold transition"
+                    className="bg-[#4CDC9C] text-[#2C373B] hover:bg-[#3fd190] rounded-lg px-3 py-2 text-[14px] font-medium transition"
                     onClick={() => navigate('/payroll')}
                   >
                     View Payroll
@@ -416,13 +428,16 @@ const Dashboard = () => {
             <div className="bg-white rounded-2xl border-[1.5px] border-[#2C373B]/30 shadow-none p-3 sm:p-4 sm:col-span-2">
               <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
                 <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center">
-                    <FileText className="h-5 w-5 text-green-600" />
+                  <div className="relative w-12 h-12 flex-shrink-0">
+                    <span className="absolute inset-0 rounded-full bg-[#EAF9F2]" />
+                    <span className="absolute top-2 left-2 w-8 h-8 rounded-full bg-[#2C373B] flex items-center justify-center">
+                      <FileText className="h-5 w-5 text-[#FFBB31]" />
+                    </span>
                   </div>
                   <div className="text-gray-700 text-base font-semibold">Reports</div>
                 </div>
                 <button
-                  className="w-full sm:w-auto bg-[#4CDC9C] text-[#2C373B] hover:bg-[#3fd190] rounded-lg px-4 py-2 font-semibold transition"
+                  className="w-full sm:w-auto bg-[#4CDC9C] text-[#2C373B] hover:bg-[#3fd190] rounded-lg px-4 py-2 text-[14px] font-medium transition"
                   onClick={() => navigate('/reports/employees')}
                 >
                   View Reports
