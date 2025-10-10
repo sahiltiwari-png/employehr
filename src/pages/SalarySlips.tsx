@@ -323,7 +323,13 @@ const SalarySlip = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-emerald-200 via-emerald-100 to-emerald-50 px-3 sm:px-6 py-6">
+    <div
+      className="min-h-screen px-3 sm:px-6 py-6"
+      style={{
+        background:
+          "linear-gradient(151.95deg, rgba(76, 220, 156, 0.81) 17.38%, rgba(255, 255, 255, 0.81) 107.36%)",
+      }}
+    >
       <div className="max-w-6xl mx-auto">
         {/* Header */}
         <div className="flex items-start justify-between mb-1">

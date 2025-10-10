@@ -146,7 +146,14 @@ const TrackLeaveRequest = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-emerald-200 via-emerald-100 to-emerald-50 px-1 sm:px-3 md:px-6 py-4" style={{ fontFamily: "Montserrat" }}>
+    <div
+      className="min-h-screen px-1 sm:px-3 md:px-6 py-4"
+      style={{
+        fontFamily: "Montserrat",
+        background:
+          "linear-gradient(151.95deg, rgba(76, 220, 156, 0.81) 17.38%, rgba(255, 255, 255, 0.81) 107.36%)",
+      }}
+    >
       <TooltipProvider>
       <h1 className="text-3xl lg:text-4xl font-bold mb-6" style={{ color: "#2C373B" }}>Track Leave request</h1>
 

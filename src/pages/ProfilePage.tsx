@@ -255,7 +255,13 @@ const ProfilePage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-emerald-200 via-emerald-100 to-emerald-50 p-4 sm:p-8">
+    <div
+      className="min-h-screen p-4 sm:p-8"
+      style={{
+        background:
+          "linear-gradient(151.95deg, rgba(76, 220, 156, 0.81) 17.38%, rgba(255, 255, 255, 0.81) 107.36%)",
+      }}
+    >
       {/* <h1 className="text-xl font-semibold mb-3 text-gray-800">Profile</h1> */}
       <Card className="w-full max-w-4xl mx-auto">
         <CardHeader className="flex flex-row items-center justify-between">

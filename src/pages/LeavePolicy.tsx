@@ -384,7 +384,13 @@ const LeavePolicy = () => {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
+      <div
+        className="min-h-screen flex items-center justify-center px-1 sm:px-3 md:px-6 py-4"
+        style={{
+          background:
+            "linear-gradient(151.95deg, rgba(76, 220, 156, 0.81) 17.38%, rgba(255, 255, 255, 0.81) 107.36%)",
+        }}
+      >
         <div className="text-lg">Loading...</div>
       </div>
     );
@@ -402,7 +408,13 @@ const LeavePolicy = () => {
   const monthEndLabel = new Date(now.getFullYear(), now.getMonth() + 1, 0).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-emerald-200 via-emerald-100 to-emerald-50 px-1 sm:px-3 md:px-6 py-4">
+    <div
+      className="min-h-screen px-1 sm:px-3 md:px-6 py-4"
+      style={{
+        background:
+          "linear-gradient(151.95deg, rgba(76, 220, 156, 0.81) 17.38%, rgba(255, 255, 255, 0.81) 107.36%)",
+      }}
+    >
       <div className="w-full space-y-6">
         <div className="flex flex-col md:flex-row justify-between md:items-center gap-4">
           <h1 className="text-xl font-semibold tracking-wide" style={{color: '#2C373B'}}>Review the policy information and manage leave types</h1>
