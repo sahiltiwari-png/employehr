@@ -389,18 +389,18 @@ const Payroll = () => {
         <div className="bg-white rounded-xl shadow-sm overflow-hidden">
           <div className="overflow-x-auto">
             <table className="min-w-[900px] w-full border-collapse">
-              <thead className="bg-gray-50 border-b">
+              <thead className="bg-[#2C373B] border-b">
                 <tr>
-                  <th className="px-2 py-2 text-left text-[12px] font-semibold text-[#2C373B]">Month</th>
-                  <th className="px-2 py-2 text-left text-[12px] font-semibold text-[#2C373B]">Basic (₹)</th>
-                  <th className="px-2 py-2 text-left text-[12px] font-semibold text-[#2C373B]">HRA (₹)</th>
-                  <th className="px-2 py-2 text-left text-[12px] font-semibold text-[#2C373B]">Gross Earnings (₹)</th>
-                  <th className="px-2 py-2 text-left text-[12px] font-semibold text-[#2C373B]">Deductions (₹)</th>
-                  <th className="px-2 py-2 text-left text-[12px] font-semibold text-[#2C373B]">Unpaid Leave Days</th>
-                  <th className="px-2 py-2 text-left text-[12px] font-semibold text-[#2C373B]">Paid Days</th>
-                  <th className="px-2 py-2 text-left text-[12px] font-semibold text-[#2C373B]">Net Salary (₹)</th>
-                  <th className="px-2 py-2 text-left text-[12px] font-semibold text-[#2C373B]">Status</th>
-                  <th className="px-2 py-2 text-left text-[12px] font-semibold text-[#2C373B]">Salary Slip</th>
+                  <th className="px-2 py-2 text-left text-[12px] font-semibold text-white whitespace-nowrap">Month</th>
+                  <th className="px-2 py-2 text-left text-[12px] font-semibold text-white whitespace-nowrap">Basic (₹)</th>
+                  <th className="px-2 py-2 text-left text-[12px] font-semibold text-white whitespace-nowrap">HRA (₹)</th>
+                  <th className="px-2 py-2 text-left text-[12px] font-semibold text-white whitespace-nowrap">Gross Earnings (₹)</th>
+                  <th className="px-2 py-2 text-left text-[12px] font-semibold text-white whitespace-nowrap">Deductions (₹)</th>
+                  <th className="px-2 py-2 text-left text-[12px] font-semibold text-white whitespace-nowrap">Unpaid Leave Days</th>
+                  <th className="px-2 py-2 text-left text-[12px] font-semibold text-white whitespace-nowrap">Paid Days</th>
+                  <th className="px-2 py-2 text-left text-[12px] font-semibold text-white whitespace-nowrap">Net Salary (₹)</th>
+                  <th className="px-2 py-2 text-left text-[12px] font-semibold text-white whitespace-nowrap">Status</th>
+                  <th className="px-2 py-2 text-left text-[12px] font-semibold text-white whitespace-nowrap">Salary Slip</th>
                 </tr>
               </thead>
 
