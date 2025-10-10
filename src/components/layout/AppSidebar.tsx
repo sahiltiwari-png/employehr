@@ -158,12 +158,12 @@ export function AppSidebar() {
                           </div>
                         </SidebarMenuButton>
                         {state !== "collapsed" && item.submenu && openSubmenu === item.title && (
-                          <div className="ml-7 mt-1 pl-3 border-l border-gray-200">
+                          <div className="ml-7 mt-2 pl-3 border-l border-gray-200 space-y-1">
                             {item.submenu.map((subItem) => (
                               <NavLink
                                 key={subItem.title}
                                 to={subItem.url}
-                                className={`${getNavClassName(subItem.url)} block py-2 px-2 text-sm rounded-md`}
+                                className={`${getNavClassName(subItem.url)} block py-2 px-2 text-sm rounded-md hover:shadow-sm`}
                               >
                                 {subItem.title}
                               </NavLink>
