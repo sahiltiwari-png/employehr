@@ -92,7 +92,13 @@ const LeaveBalance = () => {
   const avatarUrl = employeeFromApi?.profilePhotoUrl || (user as any)?.profilePhotoUrl || (user as any)?.profileImage || undefined;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-200 to-green-50 py-6 px-3 md:px-8">
+    <div
+      className="min-h-screen py-6 px-3 md:px-8"
+      style={{
+        background:
+          "linear-gradient(151.95deg, rgba(76, 220, 156, 0.81) 17.38%, rgba(255, 255, 255, 0.81) 107.36%)",
+      }}
+    >
       <div className="max-w-4xl mx-auto">
         <div className="bg-white rounded-2xl border-[1.5px] border-[#2C373B]/30 shadow-none p-4 sm:p-6">
           {/* Header like screenshot */}

@@ -419,7 +419,7 @@ const Regularization = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-emerald-100 via-emerald-50 to-white px-3 py-6 sm:px-6">
+      <div className="min-h-screen px-3 py-6 sm:px-6" style={{ background: 'linear-gradient(151.95deg, rgba(76, 220, 156, 0.81) 17.38%, rgba(255, 255, 255, 0.81) 107.36%)' }}>
         <div className="max-w-7xl mx-auto space-y-6">
           <div className="animate-pulse">
             <div className="h-8 bg-emerald-200 rounded w-1/4 mb-4"></div>
@@ -435,7 +435,7 @@ const Regularization = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-emerald-100 via-emerald-50 to-white px-2 py-6 sm:px-6">
+    <div className="min-h-screen px-2 py-6 sm:px-6" style={{ background: 'linear-gradient(151.95deg, rgba(76, 220, 156, 0.81) 17.38%, rgba(255, 255, 255, 0.81) 107.36%)' }}>
       <div className="max-w-7xl mx-auto space-y-6">
         {/* Header */}
          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
@@ -479,27 +479,27 @@ const Regularization = () => {
           <div className="bg-white rounded-xl shadow-sm border border-emerald-200 overflow-hidden">
           <div className="overflow-x-auto scrollbar-thin scrollbar-thumb-emerald-300 scrollbar-track-emerald-100" style={{ WebkitOverflowScrolling: 'touch' }}>
             <table className="min-w-[820px] w-full table-fixed">
-              <thead className="bg-emerald-50 border-b border-emerald-200">
+              <thead className="border-b" style={{ backgroundColor: '#2C373B' }}>
                 <tr>
-                  <th className="px-3 py-3 text-left text-[12px] font-semibold text-[#2C373B] w-[18%]">
+                  <th className="px-3 py-3 text-left text-[12px] font-semibold w-[18%]" style={{ color: '#FFFFFF' }}>
                     Employee
                   </th>
-                  <th className="px-3 py-3 text-left text-[12px] font-semibold text-[#2C373B] w-[10%]">
+                  <th className="px-3 py-3 text-left text-[12px] font-semibold w-[10%]" style={{ color: '#FFFFFF' }}>
                     Date
                   </th>
-                  <th className="px-5 py-3 text-left text-[12px] font-semibold text-[#2C373B] w-[8%] min-w-[110px]">
+                  <th className="px-5 py-3 text-left text-[12px] font-semibold w-[8%] min-w-[110px]" style={{ color: '#FFFFFF' }}>
                     Field
                   </th>
-                  <th className="px-6 py-3 text-left text-[12px] font-semibold text-[#2C373B] w-[10%] min-w-[120px]">
+                  <th className="px-6 py-3 text-left text-[12px] font-semibold w-[10%] min-w-[120px]" style={{ color: '#FFFFFF' }}>
                     Time
                   </th>
-                  <th className="px-6 py-3 text-left text-[12px] font-semibold text-[#2C373B] w-[20%] min-w-[160px]">
+                  <th className="px-6 py-3 text-left text-[12px] font-semibold w-[20%] min-w-[160px]" style={{ color: '#FFFFFF' }}>
                     Reason
                   </th>
-                  <th className="px-3 py-3 text-left text-[12px] font-semibold text-[#2C373B] w-[12%]">
+                  <th className="px-3 py-3 text-left text-[12px] font-semibold w-[12%]" style={{ color: '#FFFFFF' }}>
                      Status
                    </th>
-                   <th className="px-3 py-3 text-left text-[12px] font-semibold text-[#2C373B] w-[12%]">
+                   <th className="px-3 py-3 text-left text-[12px] font-semibold w-[12%]" style={{ color: '#FFFFFF' }}>
                      Remarks
                    </th>
                    
